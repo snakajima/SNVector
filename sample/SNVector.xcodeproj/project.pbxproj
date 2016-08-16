@@ -44,7 +44,8 @@
 		74F413721D63DA04006F765E = {
 			isa = PBXGroup;
 			children = (
-				74F413901D63DAF3006F765E /* src */,
+				74F413901D63DAF3006F765E /* SNDraw */,
+				74F413971D63DD0B006F765E /* src */,
 				74F4137D1D63DA04006F765E /* SNVector */,
 				74F4137C1D63DA04006F765E /* Products */,
 			);
@@ -71,15 +72,23 @@
 			path = SNVector;
 			sourceTree = "<group>";
 		};
-		74F413901D63DAF3006F765E /* src */ = {
+		74F413901D63DAF3006F765E /* SNDraw */ = {
 			isa = PBXGroup;
 			children = (
 				74F413911D63DAF3006F765E /* SNDrawView.swift */,
 				74F413921D63DAF3006F765E /* SNPath.swift */,
 				74F413931D63DAF3006F765E /* SNPathBuilder.swift */,
 			);
-			name = src;
+			name = SNDraw;
 			path = ../SNDraw/src;
+			sourceTree = "<group>";
+		};
+		74F413971D63DD0B006F765E /* src */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = src;
+			path = ../src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -307,6 +316,7 @@
 				74F4138F1D63DA04006F765E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
