@@ -1,0 +1,3 @@
+[submodule "SNDraw"]
+	path = SNDraw
+	url = git@github.com:snakajima/SNDraw.git
