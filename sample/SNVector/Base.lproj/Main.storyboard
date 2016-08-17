@@ -74,9 +74,24 @@
                     <view key="view" contentMode="scaleToFill" id="h4c-md-NT0">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="riq-Io-i0h">
+                                <rect key="frame" x="0.0" y="64" width="320" height="416"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Urj-pD-jQd" firstAttribute="top" secondItem="riq-Io-i0h" secondAttribute="bottom" id="Ndb-gl-mXF"/>
+                            <constraint firstAttribute="trailing" secondItem="riq-Io-i0h" secondAttribute="trailing" id="Y2B-dh-R0j"/>
+                            <constraint firstItem="riq-Io-i0h" firstAttribute="leading" secondItem="h4c-md-NT0" secondAttribute="leading" id="m3b-VP-jNU"/>
+                            <constraint firstItem="riq-Io-i0h" firstAttribute="top" secondItem="H0A-0X-sij" secondAttribute="bottom" id="oiq-gg-K8t"/>
+                        </constraints>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+                    <connections>
+                        <outlet property="viewMain" destination="riq-Io-i0h" id="iTH-Fc-rPB"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bil-uQ-rdo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -9,6 +9,7 @@
 import UIKit
 
 class VectorEditor: UIViewController {
+    @IBOutlet var viewMain:UIView!
     let layerCurve = CAShapeLayer()
     let layerPoly = CAShapeLayer()
     var elements = [SNPathElement]()
@@ -53,33 +54,34 @@ class VectorEditor: UIViewController {
     }
     
     func pinch(recognizer:UIPinchGestureRecognizer) {
-        print("pinch", recognizer.state.rawValue, recognizer.scale, recognizer.locationInView(self.view))
         switch(recognizer.state) {
         case .Began:
-            transformLast = view.transform
+            transformLast = viewMain.transform
         case .Changed:
-            view.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+            viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
         case .Ended:
-            view.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+            break
         default:
-            view.transform = transformLast
+            viewMain.transform = transformLast
         }
     }
     
     func pan(recognizer:UIPanGestureRecognizer) {
-        print("pan")
+        if recognizer.numberOfTouches() != 2 {
+            return
+        }
         let pt = recognizer.locationInView(view)
         let delta = pt.delta(locationLast)
         switch(recognizer.state) {
         case .Began:
-            transformLast = view.transform
+            transformLast = viewMain.transform
             locationLast = pt
         case .Changed:
-            view.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+            viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
         case .Ended:
-            view.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+            break
         default:
-            view.transform = transformLast
+            viewMain.transform = transformLast
         }
     }
 
@@ -97,8 +99,8 @@ class VectorEditor: UIViewController {
 
         updateCurve()
         findCorners()
-        self.view.layer.addSublayer(layerPoly)
-        self.view.layer.addSublayer(layerCurve)
+        viewMain.layer.addSublayer(layerPoly)
+        viewMain.layer.addSublayer(layerCurve)
         
         func addControlViewAt(pt:CGPoint, index:Int) {
             let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
@@ -106,14 +108,14 @@ class VectorEditor: UIViewController {
             view.layer.cornerRadius = radius
             view.layer.masksToBounds = true
             view.tag = baseTag + index
-            self.view.insertSubview(view, atIndex: 0)
+            viewMain.insertSubview(view, atIndex: 0)
             view.center = pt
         }
         func addAnchorViewAt(pt:CGPoint, index:Int) {
             let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
             view.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
             view.tag = baseTag + index + elements.count
-            self.view.addSubview(view)
+            viewMain.addSubview(view)
             view.center = pt
         }
         
@@ -146,7 +148,7 @@ extension VectorEditor {
             if let subview = touch.view where subview.tag >= baseTag {
                 indexDragging = subview.tag - baseTag
                 print("began dragging", indexDragging!)
-                let pt = touch.locationInView(view)
+                let pt = touch.locationInView(viewMain)
                 let center = subview.center
                 offset = CGPointMake(pt.x - center.x, pt.y - center.y)
             }
@@ -157,7 +159,7 @@ extension VectorEditor {
         if let index = indexDragging,
            let touch = touches.first,
            let subview = view.viewWithTag(index + baseTag) {
-            let pt = touch.locationInView(view)
+            let pt = touch.locationInView(viewMain)
             subview.center = CGPointMake(pt.x - offset.x, pt.y - offset.y)
         }
     }
