@@ -9,24 +9,26 @@
 import UIKit
 
 class VectorEditor: UIViewController {
+    let layerCurve = CAShapeLayer()
     var elements = [SNPathElement]()
     let radius = 20.0 as CGFloat
     let baseTag = 100
     var indexDragging:Int?
     var offset = CGPoint.zero
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-        let layerCurve = CAShapeLayer()
-        
+    private func updateCurve() {
         layerCurve.path = SNPath.pathFrom(elements)
         layerCurve.lineWidth = 1
         layerCurve.fillColor = UIColor.clearColor().CGColor
         layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 1.0).CGColor
         layerCurve.lineCap = "round"
         layerCurve.lineJoin = "round"
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        updateCurve()
         self.view.layer.addSublayer(layerCurve)
         
         func addViewAt(pt:CGPoint, index:Int) {
@@ -87,6 +89,18 @@ extension VectorEditor {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let index = indexDragging,
+           let subview = view.viewWithTag(index + baseTag) {
+            if index < elements.count {
+                switch(elements[index]) {
+                case let quad as SNQuadCurve:
+                    elements[index] = SNQuadCurve(cp: subview.center, pt: quad.cp)
+                default:
+                    break
+                }
+            }
+            updateCurve()
+        }
         indexDragging = nil
     }
     
