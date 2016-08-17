@@ -54,11 +54,9 @@ class VectorEditor: UIViewController {
     
     func pinch(recognizer:UIPinchGestureRecognizer) {
         print("pinch", recognizer.state.rawValue, recognizer.scale, recognizer.locationInView(self.view))
-        let pt = recognizer.locationInView(view)
         switch(recognizer.state) {
         case .Began:
             transformLast = view.transform
-            locationLast = pt
         case .Changed:
             view.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
         case .Ended:
@@ -67,12 +65,33 @@ class VectorEditor: UIViewController {
             view.transform = transformLast
         }
     }
+    
+    func pan(recognizer:UIPanGestureRecognizer) {
+        print("pan")
+        let pt = recognizer.locationInView(view)
+        let delta = pt.delta(locationLast)
+        switch(recognizer.state) {
+        case .Began:
+            transformLast = view.transform
+            locationLast = pt
+        case .Changed:
+            view.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+        case .Ended:
+            view.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+        default:
+            view.transform = transformLast
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let recognizer = UIPinchGestureRecognizer(target: self, action: #selector(VectorEditor.pinch))
-        view.addGestureRecognizer(recognizer)
+        let pinch = UIPinchGestureRecognizer(target: self, action: #selector(VectorEditor.pinch))
+        view.addGestureRecognizer(pinch)
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.pan))
+        pan.minimumNumberOfTouches = 2
+        pan.maximumNumberOfTouches = 2
+        view.addGestureRecognizer(pan)
         
         print("--")
 
