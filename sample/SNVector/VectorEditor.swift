@@ -64,6 +64,11 @@ class VectorEditor: UIViewController {
     }
 }
 
+extension CGPoint {
+    func middle(pt:CGPoint) -> CGPoint {
+        return CGPointMake((self.x + pt.x)/2, (self.y + pt.y)/2)
+    }
+}
 
 // MARK: UIResponder
 
@@ -91,10 +96,18 @@ extension VectorEditor {
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let index = indexDragging,
            let subview = view.viewWithTag(index + baseTag) {
+            let cp = subview.center
             if index < elements.count {
                 switch(elements[index]) {
                 case let quad as SNQuadCurve:
-                    elements[index] = SNQuadCurve(cp: subview.center, pt: quad.cp)
+                    if index > 0, let prev = elements[index-1] as? SNQuadCurve {
+                        elements[index-1] = SNQuadCurve(cp: prev.cp, pt: prev.cp.middle(cp))
+                    }
+                    if index-1 < elements.count, let next = elements[index+1] as? SNQuadCurve {
+                        elements[index] = SNQuadCurve(cp: cp, pt: cp.middle(next.cp))
+                    } else {
+                        elements[index] = SNQuadCurve(cp: cp, pt: quad.cp)
+                    }
                 default:
                     break
                 }
