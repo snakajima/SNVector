@@ -10,6 +10,7 @@ import UIKit
 
 class VectorEditor: UIViewController {
     var elements = [SNPathElement]()
+    let radius = 20.0 as CGFloat
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,12 +19,38 @@ class VectorEditor: UIViewController {
         let layerCurve = CAShapeLayer()
         
         layerCurve.path = SNPath.pathFrom(elements)
-        layerCurve.lineWidth = 10
+        layerCurve.lineWidth = 1
         layerCurve.fillColor = UIColor.clearColor().CGColor
-        layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 0.3).CGColor
+        layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 1.0).CGColor
         layerCurve.lineCap = "round"
         layerCurve.lineJoin = "round"
         self.view.layer.addSublayer(layerCurve)
+        
+        func addViewAt(pt:CGPoint, index:Int) {
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
+            view.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
+            view.layer.cornerRadius = radius
+            view.layer.masksToBounds = true
+            view.tag = index
+            self.view.addSubview(view)
+            view.center = pt
+        }
+        
+        for (index, element) in elements.enumerate() {
+            switch(element) {
+            case let move as SNMove:
+                addViewAt(move.pt, index:index)
+            case let quad as SNQuadCurve:
+                addViewAt(quad.cp, index:index)
+                //addViewAt(quad.pt)
+            default:
+                break
+            }
+        }
+        
+        if let quad = elements.last as? SNQuadCurve {
+            addViewAt(quad.pt, index:elements.count)
+        }
     }
 
     override func didReceiveMemoryWarning() {
