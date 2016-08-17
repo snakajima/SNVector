@@ -17,6 +17,8 @@ class VectorEditor: UIViewController {
     let baseTag = 100
     var indexDragging:Int?
     var offset = CGPoint.zero
+    var transformLast = CGAffineTransformIdentity
+    var locationLast = CGPoint.zero
 
     private func updateCurve() {
         layerCurve.path = SNPath.pathFrom(elements)
@@ -49,9 +51,29 @@ class VectorEditor: UIViewController {
         corners.append(true)
         assert(corners.count == elements.count)
     }
+    
+    func pinch(recognizer:UIPinchGestureRecognizer) {
+        print("pinch", recognizer.state.rawValue, recognizer.scale, recognizer.locationInView(self.view))
+        let pt = recognizer.locationInView(view)
+        switch(recognizer.state) {
+        case .Began:
+            transformLast = view.transform
+            locationLast = pt
+        case .Changed:
+            view.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+        case .Ended:
+            view.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+        default:
+            view.transform = transformLast
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let recognizer = UIPinchGestureRecognizer(target: self, action: #selector(VectorEditor.pinch))
+        view.addGestureRecognizer(recognizer)
+        
         print("--")
 
         updateCurve()
