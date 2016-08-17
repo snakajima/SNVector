@@ -57,7 +57,7 @@ class VectorEditor: UIViewController {
                 return false
             }())
         }
-        corners.append(false)
+        corners.append(true)
         assert(corners.count == elements.count)
     }
 
@@ -70,7 +70,7 @@ class VectorEditor: UIViewController {
         self.view.layer.addSublayer(layerPoly)
         self.view.layer.addSublayer(layerCurve)
         
-        func addViewAt(pt:CGPoint, index:Int) {
+        func addControlViewAt(pt:CGPoint, index:Int) {
             let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
             view.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
             view.layer.cornerRadius = radius
@@ -79,21 +79,26 @@ class VectorEditor: UIViewController {
             self.view.addSubview(view)
             view.center = pt
         }
+        func addAnchorViewAt(pt:CGPoint, index:Int) {
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
+            view.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
+            view.tag = baseTag + index + elements.count
+            self.view.addSubview(view)
+            view.center = pt
+        }
         
         for (index, element) in elements.enumerate() {
             switch(element) {
             case let move as SNMove:
-                addViewAt(move.pt, index:index)
+                addAnchorViewAt(move.pt, index:index)
             case let quad as SNQuadCurve:
-                addViewAt(quad.cp, index:index)
-                //addViewAt(quad.pt)
+                addControlViewAt(quad.cp, index:index)
+                if corners[index] {
+                    addAnchorViewAt(quad.pt, index: index)
+                }
             default:
                 break
             }
-        }
-        
-        if let quad = elements.last as? SNQuadCurve {
-            addViewAt(quad.pt, index:elements.count)
         }
     }
 
