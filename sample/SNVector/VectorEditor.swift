@@ -8,17 +8,6 @@
 
 import UIKit
 
-extension CGPoint {
-    func middle(pt:CGPoint) -> CGPoint {
-        return CGPointMake((self.x + pt.x)/2, (self.y + pt.y)/2)
-    }
-    
-    func distance2(pt:CGPoint) -> CGFloat {
-        let (dx, dy) = (self.x - pt.x, self.y - pt.y)
-        return dx * dx + dy * dy
-    }
-}
-
 class VectorEditor: UIViewController {
     let layerCurve = CAShapeLayer()
     let layerPoly = CAShapeLayer()
