@@ -21,6 +21,7 @@ extension CGPoint {
 
 class VectorEditor: UIViewController {
     let layerCurve = CAShapeLayer()
+    let layerPoly = CAShapeLayer()
     var elements = [SNPathElement]()
     var corners = [Bool]()
     let radius = 20.0 as CGFloat
@@ -30,11 +31,17 @@ class VectorEditor: UIViewController {
 
     private func updateCurve() {
         layerCurve.path = SNPath.pathFrom(elements)
-        layerCurve.lineWidth = 1
+        layerCurve.lineWidth = 3
         layerCurve.fillColor = UIColor.clearColor().CGColor
         layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 1.0).CGColor
         layerCurve.lineCap = "round"
         layerCurve.lineJoin = "round"
+        layerPoly.path = SNPath.polyPathFrom(elements)
+        layerPoly.lineWidth = 1
+        layerPoly.fillColor = UIColor.clearColor().CGColor
+        layerPoly.strokeColor = UIColor(red: 0, green: 0.8, blue: 0, alpha: 1.0).CGColor
+        layerPoly.lineCap = "round"
+        layerPoly.lineJoin = "round"
     }
     
     private func findCorners() {
@@ -60,6 +67,7 @@ class VectorEditor: UIViewController {
 
         updateCurve()
         findCorners()
+        self.view.layer.addSublayer(layerPoly)
         self.view.layer.addSublayer(layerCurve)
         
         func addViewAt(pt:CGPoint, index:Int) {
