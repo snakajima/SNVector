@@ -18,6 +18,7 @@ class ViewController: UIViewController {
         
         drawView.delegate = self
         drawView.shapeLayer.lineWidth = 5.0
+        drawView.builder.minSegment = 40.0
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

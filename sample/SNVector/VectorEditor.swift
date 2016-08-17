@@ -8,9 +8,21 @@
 
 import UIKit
 
+extension CGPoint {
+    func middle(pt:CGPoint) -> CGPoint {
+        return CGPointMake((self.x + pt.x)/2, (self.y + pt.y)/2)
+    }
+    
+    func distance2(pt:CGPoint) -> CGFloat {
+        let (dx, dy) = (self.x - pt.x, self.y - pt.y)
+        return dx * dx + dy * dy
+    }
+}
+
 class VectorEditor: UIViewController {
     let layerCurve = CAShapeLayer()
     var elements = [SNPathElement]()
+    var corners = [Bool]()
     let radius = 20.0 as CGFloat
     let baseTag = 100
     var indexDragging:Int?
@@ -24,11 +36,30 @@ class VectorEditor: UIViewController {
         layerCurve.lineCap = "round"
         layerCurve.lineJoin = "round"
     }
+    
+    private func findCorners() {
+        corners.removeAll()
+        for index in 0..<elements.count-1 {
+            corners.append({
+                if let quad = elements[index] as? SNQuadCurve,
+                   let next = elements[index+1] as? SNQuadCurve where
+                    quad.pt.distance2(quad.cp.middle(next.cp)) > 1 {
+                    print("corner at", index)
+                    return true
+                }
+                return false
+            }())
+        }
+        corners.append(false)
+        assert(corners.count == elements.count)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("--")
 
         updateCurve()
+        findCorners()
         self.view.layer.addSublayer(layerCurve)
         
         func addViewAt(pt:CGPoint, index:Int) {
@@ -64,12 +95,6 @@ class VectorEditor: UIViewController {
     }
 }
 
-extension CGPoint {
-    func middle(pt:CGPoint) -> CGPoint {
-        return CGPointMake((self.x + pt.x)/2, (self.y + pt.y)/2)
-    }
-}
-
 // MARK: UIResponder
 
 extension VectorEditor {
@@ -77,6 +102,7 @@ extension VectorEditor {
         if let touch = touches.first {
             if let subview = touch.view where subview.tag >= baseTag {
                 indexDragging = subview.tag - baseTag
+                print("began dragging", indexDragging!)
                 let pt = touch.locationInView(view)
                 let center = subview.center
                 offset = CGPointMake(pt.x - center.x, pt.y - center.y)
@@ -100,13 +126,13 @@ extension VectorEditor {
             if index < elements.count {
                 switch(elements[index]) {
                 case let quad as SNQuadCurve:
-                    if index > 0, let prev = elements[index-1] as? SNQuadCurve {
+                    if index > 0 && !corners[index-1], let prev = elements[index-1] as? SNQuadCurve {
                         elements[index-1] = SNQuadCurve(cp: prev.cp, pt: prev.cp.middle(cp))
                     }
-                    if index-1 < elements.count, let next = elements[index+1] as? SNQuadCurve {
+                    if index+1 < elements.count && !corners[index], let next = elements[index+1] as? SNQuadCurve {
                         elements[index] = SNQuadCurve(cp: cp, pt: cp.middle(next.cp))
                     } else {
-                        elements[index] = SNQuadCurve(cp: cp, pt: quad.cp)
+                        elements[index] = SNQuadCurve(cp: cp, pt: quad.pt)
                     }
                 default:
                     break
