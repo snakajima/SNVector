@@ -9,31 +9,30 @@
 import UIKit
 
 class ViewController: UIViewController {
-    @IBOutlet weak var drawView:SNDrawView?
+    @IBOutlet weak var drawView:SNDrawView!
     var layers = [CALayer]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        drawView?.delegate = self
-        drawView?.shapeLayer.lineWidth = 5.0
+        drawView.delegate = self
+        drawView.shapeLayer.lineWidth = 5.0
     }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let editor = segue.destinationViewController as? VectorEditor {
+            editor.elements = drawView.builder.elements
+        }
+    }
+
 }
 
 extension ViewController : SNDrawViewDelegate {
     func didComplete(elements:[SNPathElement]) -> Bool {
-        print("complete", elements.count)
-
         let layerCurve = CAShapeLayer()
         
-        // Extra round-trips to SVG and CGPath
-        let svg = SNPath.svgFrom(elements)
-        let es = SNPath.elementsFrom(svg)
-        let path = SNPath.pathFrom(es)
-        let es2 = SNPath.elementsFrom(path)
-        
-        layerCurve.path = SNPath.pathFrom(es2)
+        layerCurve.path = SNPath.pathFrom(elements)
         layerCurve.lineWidth = 10
         layerCurve.fillColor = UIColor.clearColor().CGColor
         layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 0.3).CGColor
@@ -50,7 +49,7 @@ extension ViewController : SNDrawViewDelegate {
         self.view.layer.addSublayer(layerLine)
         layers.append(layerLine)
         
-        print(SNPath.svgFrom(elements))
+        self.performSegueWithIdentifier("edit", sender: nil)
 
         return true
     }
