@@ -54,6 +54,14 @@ extension ViewController : SNDrawViewDelegate {
 
         return true
     }
+
+    @IBAction func clear() {
+        for layer in layers {
+            layer.removeFromSuperlayer()
+        }
+        layers.removeAll()
+    }
 }
+
 
 

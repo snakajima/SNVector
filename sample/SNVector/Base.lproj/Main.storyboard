@@ -20,9 +20,9 @@
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zIv-Sd-NG5">
                                 <rect key="frame" x="0.0" y="436" width="320" height="44"/>
                                 <items>
-                                    <barButtonItem title="Edit" id="ZZD-2a-WLa">
+                                    <barButtonItem title="Clear" id="ZZD-2a-WLa">
                                         <connections>
-                                            <segue destination="jA3-AZ-z9e" kind="show" identifier="edit" id="Dqc-JQ-qJb"/>
+                                            <action selector="clear" destination="BYZ-38-t0r" id="6Yr-Bb-vXi"/>
                                         </connections>
                                     </barButtonItem>
                                 </items>
@@ -39,6 +39,7 @@
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="drawView" destination="8bC-Xf-vdC" id="SXp-ab-WYT"/>
+                        <segue destination="jA3-AZ-z9e" kind="show" identifier="edit" id="PEC-4B-BhT"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
