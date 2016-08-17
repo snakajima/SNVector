@@ -16,6 +16,7 @@
 		74F413951D63DAF3006F765E /* SNPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F413921D63DAF3006F765E /* SNPath.swift */; };
 		74F413961D63DAF3006F765E /* SNPathBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F413931D63DAF3006F765E /* SNPathBuilder.swift */; };
 		74F413991D63DDA7006F765E /* VectorEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F413981D63DDA7006F765E /* VectorEditor.swift */; };
+		74F4139B1D640D93006F765E /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 74F4139A1D640D93006F765E /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		74F413921D63DAF3006F765E /* SNPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNPath.swift; sourceTree = "<group>"; };
 		74F413931D63DAF3006F765E /* SNPathBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNPathBuilder.swift; sourceTree = "<group>"; };
 		74F413981D63DDA7006F765E /* VectorEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorEditor.swift; sourceTree = "<group>"; };
+		74F4139A1D640D93006F765E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 		74F4137D1D63DA04006F765E /* SNVector */ = {
 			isa = PBXGroup;
 			children = (
+				74F4139A1D640D93006F765E /* README.md */,
 				74F413981D63DDA7006F765E /* VectorEditor.swift */,
 				74F4137E1D63DA04006F765E /* AppDelegate.swift */,
 				74F413801D63DA04006F765E /* ViewController.swift */,
@@ -168,6 +171,7 @@
 				74F413961D63DAF3006F765E /* SNPathBuilder.swift in Sources */,
 				74F413811D63DA04006F765E /* ViewController.swift in Sources */,
 				74F413951D63DAF3006F765E /* SNPath.swift in Sources */,
+				74F4139B1D640D93006F765E /* README.md in Sources */,
 				74F413991D63DDA7006F765E /* VectorEditor.swift in Sources */,
 				74F413941D63DAF3006F765E /* SNDrawView.swift in Sources */,
 				74F4137F1D63DA04006F765E /* AppDelegate.swift in Sources */,
