@@ -13,6 +13,7 @@ class VectorEditor: UIViewController {
     let radius = 20.0 as CGFloat
     let baseTag = 100
     var indexDragging:Int?
+    var offset = CGPoint.zero
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,6 +70,9 @@ extension VectorEditor {
         if let touch = touches.first {
             if let subview = touch.view where subview.tag >= baseTag {
                 indexDragging = subview.tag - baseTag
+                let pt = touch.locationInView(view)
+                let center = subview.center
+                offset = CGPointMake(pt.x - center.x, pt.y - center.y)
             }
         }
     }
@@ -78,7 +82,7 @@ extension VectorEditor {
            let touch = touches.first,
            let subview = view.viewWithTag(index + baseTag) {
             let pt = touch.locationInView(view)
-            subview.center = pt
+            subview.center = CGPointMake(pt.x - offset.x, pt.y - offset.y)
         }
     }
     
