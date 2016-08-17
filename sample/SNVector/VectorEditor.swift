@@ -76,7 +76,7 @@ class VectorEditor: UIViewController {
             view.layer.cornerRadius = radius
             view.layer.masksToBounds = true
             view.tag = baseTag + index
-            self.view.addSubview(view)
+            self.view.insertSubview(view, atIndex: 0)
             view.center = pt
         }
         func addAnchorViewAt(pt:CGPoint, index:Int) {
@@ -133,7 +133,7 @@ extension VectorEditor {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let index = indexDragging,
+        if var index = indexDragging,
            let subview = view.viewWithTag(index + baseTag) {
             let cp = subview.center
             if index < elements.count {
@@ -147,6 +147,17 @@ extension VectorEditor {
                     } else {
                         elements[index] = SNQuadCurve(cp: cp, pt: quad.pt)
                     }
+                default:
+                    break
+                }
+            } else {
+                index -= elements.count
+                assert(index < elements.count)
+                switch(elements[index]) {
+                case let quad as SNQuadCurve:
+                    elements[index] = SNQuadCurve(cp: quad.cp, pt: cp)
+                case _ as SNMove:
+                    elements[index] = SNMove(pt: cp)
                 default:
                     break
                 }
