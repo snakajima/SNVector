@@ -9,7 +9,7 @@
 import UIKit
 
 class VectorEditor: UIViewController {
-    @IBOutlet var viewMain:SNEditorView!
+    @IBOutlet var viewMain:UIView!
     let layerCurve = CAShapeLayer()
     let layerPoly = CAShapeLayer()
     var elements = [SNPathElement]()
@@ -123,6 +123,10 @@ class VectorEditor: UIViewController {
 // MARK: gesture
 
 extension VectorEditor {
+    override func canBecomeFirstResponder() -> Bool {
+        return true
+    }
+
     func tapNode(recognizer:UITapGestureRecognizer) {
         if let subview = recognizer.view {
             viewMain.becomeFirstResponder()
@@ -131,7 +135,9 @@ extension VectorEditor {
             print("tapped", index)
             let mc = UIMenuController.sharedMenuController()
             //mc.arrowDirection = UIMenuControllerArrowDirection.Down
-            mc.setTargetRect(subview.frame, inView: viewMain)
+            var frame = CGRectApplyAffineTransform(subview.frame, viewMain.transform)
+            frame.origin.y += viewMain.frame.origin.y
+            mc.setTargetRect(frame, inView: view)
             let menu1 = UIMenuItem(title: "hello1", action: #selector(VectorEditor.hello))
             let menu2 = UIMenuItem(title: "hello2", action: #selector(VectorEditor.hello))
             mc.menuItems = [menu1, menu2]

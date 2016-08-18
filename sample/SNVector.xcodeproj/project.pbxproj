@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7440D01B1D6577C8002814F2 /* SNEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7440D01A1D6577C8002814F2 /* SNEditorView.swift */; };
 		74F4137F1D63DA04006F765E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4137E1D63DA04006F765E /* AppDelegate.swift */; };
 		74F413811D63DA04006F765E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F413801D63DA04006F765E /* ViewController.swift */; };
 		74F413841D63DA04006F765E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74F413821D63DA04006F765E /* Main.storyboard */; };
@@ -21,7 +20,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7440D01A1D6577C8002814F2 /* SNEditorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNEditorView.swift; sourceTree = "<group>"; };
 		74F4137B1D63DA04006F765E /* SNVector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNVector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74F4137E1D63DA04006F765E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74F413801D63DA04006F765E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -70,7 +68,6 @@
 			children = (
 				74F4139A1D640D93006F765E /* README.md */,
 				74F413981D63DDA7006F765E /* VectorEditor.swift */,
-				7440D01A1D6577C8002814F2 /* SNEditorView.swift */,
 				74F4137E1D63DA04006F765E /* AppDelegate.swift */,
 				74F413801D63DA04006F765E /* ViewController.swift */,
 				74F413821D63DA04006F765E /* Main.storyboard */,
@@ -171,7 +168,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7440D01B1D6577C8002814F2 /* SNEditorView.swift in Sources */,
 				74F413961D63DAF3006F765E /* SNPathBuilder.swift in Sources */,
 				74F413811D63DA04006F765E /* ViewController.swift in Sources */,
 				74F413951D63DAF3006F765E /* SNPath.swift in Sources */,
