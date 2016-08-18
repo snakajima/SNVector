@@ -70,31 +70,33 @@ class VectorEditor: UIViewController {
         viewMain.layer.addSublayer(layerPoly)
         viewMain.layer.addSublayer(layerCurve)
         
-        func addControlViewAt(pt:CGPoint, index:Int) {
-            let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
-            view.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
-            view.layer.cornerRadius = radius
-            view.layer.masksToBounds = true
-            view.tag = baseTag + index
-            viewMain.insertSubview(view, atIndex: 0)
-            view.center = pt
-
+        func addGestureRecognizers(subview:UIView) {
             let panNode = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.panNode))
             panNode.minimumNumberOfTouches = 1
             panNode.maximumNumberOfTouches = 1
-            view.addGestureRecognizer(panNode)
+            subview.addGestureRecognizer(panNode)
+            
+            let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
+            subview.addGestureRecognizer(tap)
+        }
+        
+        func addControlViewAt(pt:CGPoint, index:Int) {
+            let subview = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
+            subview.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
+            subview.layer.cornerRadius = radius
+            subview.layer.masksToBounds = true
+            subview.tag = baseTag + index
+            viewMain.insertSubview(subview, atIndex: 0)
+            subview.center = pt
+            addGestureRecognizers(subview)
         }
         func addAnchorViewAt(pt:CGPoint, index:Int) {
-            let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
-            view.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
-            view.tag = baseTag + index + elements.count
-            viewMain.addSubview(view)
-            view.center = pt
-
-            let panNode = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.panNode))
-            panNode.minimumNumberOfTouches = 1
-            panNode.maximumNumberOfTouches = 1
-            view.addGestureRecognizer(panNode)
+            let subview = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
+            subview.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
+            subview.tag = baseTag + index + elements.count
+            viewMain.addSubview(subview)
+            subview.center = pt
+            addGestureRecognizers(subview)
         }
         
         for (index, element) in elements.enumerate() {
@@ -118,9 +120,16 @@ class VectorEditor: UIViewController {
     }
 }
 
-// MARK: pan
+// MARK: gesture
 
 extension VectorEditor {
+    func tapNode(recognizer:UITapGestureRecognizer) {
+        if let subview = recognizer.view {
+            let index = subview.tag - baseTag
+            print("tapped", index)
+        }
+    }
+
     func pinch(recognizer:UIPinchGestureRecognizer) {
         switch(recognizer.state) {
         case .Began:
