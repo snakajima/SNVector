@@ -9,7 +9,7 @@
 import UIKit
 
 class VectorEditor: UIViewController {
-    @IBOutlet var viewMain:UIView!
+    @IBOutlet var viewMain:SNEditorView!
     let layerCurve = CAShapeLayer()
     let layerPoly = CAShapeLayer()
     var elements = [SNPathElement]()
@@ -125,14 +125,28 @@ class VectorEditor: UIViewController {
 extension VectorEditor {
     func tapNode(recognizer:UITapGestureRecognizer) {
         if let subview = recognizer.view {
+            viewMain.becomeFirstResponder()
+            
             let index = subview.tag - baseTag
             print("tapped", index)
+            let mc = UIMenuController.sharedMenuController()
+            //mc.arrowDirection = UIMenuControllerArrowDirection.Down
+            mc.setTargetRect(subview.frame, inView: viewMain)
+            let menu1 = UIMenuItem(title: "hello1", action: #selector(VectorEditor.hello))
+            let menu2 = UIMenuItem(title: "hello2", action: #selector(VectorEditor.hello))
+            mc.menuItems = [menu1, menu2]
+            mc.menuVisible = true
         }
+    }
+    
+    func hello(menuController: UIMenuController) {
+        print("hello")
     }
 
     func pinch(recognizer:UIPinchGestureRecognizer) {
         switch(recognizer.state) {
         case .Began:
+            viewMain.resignFirstResponder()
             transformLast = viewMain.transform
         case .Changed:
             viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
@@ -154,6 +168,7 @@ extension VectorEditor {
         let delta = pt.delta(locationLast)
         switch(recognizer.state) {
         case .Began:
+            viewMain.resignFirstResponder()
             transformLast = viewMain.transform
             locationLast = pt
         case .Changed:
@@ -172,6 +187,7 @@ extension VectorEditor {
         let pt = recognizer.locationInView(viewMain)
         switch(recognizer.state) {
         case .Began:
+            viewMain.resignFirstResponder()
             indexDragging = subview.tag - baseTag
             offset = pt.delta(subview.center)
         case .Changed:

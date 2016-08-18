@@ -75,7 +75,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="riq-Io-i0h">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="riq-Io-i0h" customClass="SNEditorView" customModule="SNVector" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
