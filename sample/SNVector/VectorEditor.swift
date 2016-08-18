@@ -154,20 +154,18 @@ class VectorEditor: UIViewController {
 
 extension VectorEditor {
     func panNode(recognizer:UIPanGestureRecognizer) {
+        guard let subview = recognizer.view else {
+            return
+        }
         let pt = recognizer.locationInView(viewMain)
         switch(recognizer.state) {
         case .Began:
-            if let subview = recognizer.view where subview.tag >= baseTag {
-                indexDragging = subview.tag - baseTag
-                print("began dragging", indexDragging!)
-                let center = subview.center
-                offset = CGPointMake(pt.x - center.x, pt.y - center.y)
-            }
+            indexDragging = subview.tag - baseTag
+            offset = pt.delta(subview.center)
         case .Changed:
-            if var index = indexDragging,
-               let subview = view.viewWithTag(index + baseTag) {
-                subview.center = CGPointMake(pt.x - offset.x, pt.y - offset.y)
-                let cp = subview.center
+            if var index = indexDragging {
+                let cp = pt.delta(offset)
+                subview.center = cp
                 if index < elements.count {
                     switch(elements[index]) {
                     case let quad as SNQuadCurve:
