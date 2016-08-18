@@ -146,8 +146,8 @@ extension VectorEditor {
     func pinch(recognizer:UIPinchGestureRecognizer) {
         switch(recognizer.state) {
         case .Began:
-            viewMain.resignFirstResponder()
             transformLast = viewMain.transform
+            UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
             viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
             var xf = CGAffineTransformInvert(viewMain.transform)
@@ -168,9 +168,9 @@ extension VectorEditor {
         let delta = pt.delta(locationLast)
         switch(recognizer.state) {
         case .Began:
-            viewMain.resignFirstResponder()
             transformLast = viewMain.transform
             locationLast = pt
+            UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
             viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
         case .Ended:
@@ -187,9 +187,9 @@ extension VectorEditor {
         let pt = recognizer.locationInView(viewMain)
         switch(recognizer.state) {
         case .Began:
-            viewMain.resignFirstResponder()
             indexDragging = subview.tag - baseTag
             offset = pt.delta(subview.center)
+            UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
             if var index = indexDragging {
                 let cp = pt.delta(offset)
