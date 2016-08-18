@@ -110,6 +110,11 @@ class VectorEditor: UIViewController {
             view.tag = baseTag + index
             viewMain.insertSubview(view, atIndex: 0)
             view.center = pt
+
+            let panNode = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.panNode))
+            panNode.minimumNumberOfTouches = 1
+            panNode.maximumNumberOfTouches = 1
+            view.addGestureRecognizer(panNode)
         }
         func addAnchorViewAt(pt:CGPoint, index:Int) {
             let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
@@ -117,6 +122,11 @@ class VectorEditor: UIViewController {
             view.tag = baseTag + index + elements.count
             viewMain.addSubview(view)
             view.center = pt
+
+            let panNode = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.panNode))
+            panNode.minimumNumberOfTouches = 1
+            panNode.maximumNumberOfTouches = 1
+            view.addGestureRecognizer(panNode)
         }
         
         for (index, element) in elements.enumerate() {
@@ -140,66 +150,59 @@ class VectorEditor: UIViewController {
     }
 }
 
-// MARK: UIResponder
+// MARK: panNode
 
 extension VectorEditor {
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let touch = touches.first {
-            if let subview = touch.view where subview.tag >= baseTag {
+    func panNode(recognizer:UIPanGestureRecognizer) {
+        let pt = recognizer.locationInView(viewMain)
+        switch(recognizer.state) {
+        case .Began:
+            if let subview = recognizer.view where subview.tag >= baseTag {
                 indexDragging = subview.tag - baseTag
                 print("began dragging", indexDragging!)
-                let pt = touch.locationInView(viewMain)
                 let center = subview.center
                 offset = CGPointMake(pt.x - center.x, pt.y - center.y)
             }
-        }
-    }
-    
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let index = indexDragging,
-           let touch = touches.first,
-           let subview = view.viewWithTag(index + baseTag) {
-            let pt = touch.locationInView(viewMain)
-            subview.center = CGPointMake(pt.x - offset.x, pt.y - offset.y)
-        }
-    }
-    
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if var index = indexDragging,
-           let subview = view.viewWithTag(index + baseTag) {
-            let cp = subview.center
-            if index < elements.count {
-                switch(elements[index]) {
-                case let quad as SNQuadCurve:
-                    if index > 0 && !corners[index-1], let prev = elements[index-1] as? SNQuadCurve {
-                        elements[index-1] = SNQuadCurve(cp: prev.cp, pt: prev.cp.middle(cp))
-                    }
-                    if index+1 < elements.count && !corners[index], let next = elements[index+1] as? SNQuadCurve {
-                        elements[index] = SNQuadCurve(cp: cp, pt: cp.middle(next.cp))
-                    } else {
-                        elements[index] = SNQuadCurve(cp: cp, pt: quad.pt)
-                    }
-                default:
-                    break
-                }
-            } else {
-                index -= elements.count
-                assert(index < elements.count)
-                switch(elements[index]) {
-                case let quad as SNQuadCurve:
-                    elements[index] = SNQuadCurve(cp: quad.cp, pt: cp)
-                case _ as SNMove:
-                    elements[index] = SNMove(pt: cp)
-                default:
-                    break
-                }
+        case .Changed:
+            if let index = indexDragging,
+               let subview = view.viewWithTag(index + baseTag) {
+                subview.center = CGPointMake(pt.x - offset.x, pt.y - offset.y)
             }
-            updateCurve()
+        case .Ended:
+            if var index = indexDragging,
+               let subview = view.viewWithTag(index + baseTag) {
+                let cp = subview.center
+                if index < elements.count {
+                    switch(elements[index]) {
+                    case let quad as SNQuadCurve:
+                        if index > 0 && !corners[index-1], let prev = elements[index-1] as? SNQuadCurve {
+                            elements[index-1] = SNQuadCurve(cp: prev.cp, pt: prev.cp.middle(cp))
+                        }
+                        if index+1 < elements.count && !corners[index], let next = elements[index+1] as? SNQuadCurve {
+                            elements[index] = SNQuadCurve(cp: cp, pt: cp.middle(next.cp))
+                        } else {
+                            elements[index] = SNQuadCurve(cp: cp, pt: quad.pt)
+                        }
+                    default:
+                        break
+                    }
+                } else {
+                    index -= elements.count
+                    assert(index < elements.count)
+                    switch(elements[index]) {
+                    case let quad as SNQuadCurve:
+                        elements[index] = SNQuadCurve(cp: quad.cp, pt: cp)
+                    case _ as SNMove:
+                        elements[index] = SNMove(pt: cp)
+                    default:
+                        break
+                    }
+                }
+                updateCurve()
+            }
+            indexDragging = nil
+        default:
+            break
         }
-        indexDragging = nil
-    }
-    
-    override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
-        indexDragging = nil
     }
 }
