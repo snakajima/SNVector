@@ -164,13 +164,9 @@ extension VectorEditor {
                 offset = CGPointMake(pt.x - center.x, pt.y - center.y)
             }
         case .Changed:
-            if let index = indexDragging,
-               let subview = view.viewWithTag(index + baseTag) {
-                subview.center = CGPointMake(pt.x - offset.x, pt.y - offset.y)
-            }
-        case .Ended:
             if var index = indexDragging,
                let subview = view.viewWithTag(index + baseTag) {
+                subview.center = CGPointMake(pt.x - offset.x, pt.y - offset.y)
                 let cp = subview.center
                 if index < elements.count {
                     switch(elements[index]) {
@@ -200,6 +196,7 @@ extension VectorEditor {
                 }
                 updateCurve()
             }
+        case .Ended:
             indexDragging = nil
         default:
             break
