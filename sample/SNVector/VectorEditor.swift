@@ -14,7 +14,7 @@ class VectorEditor: UIViewController {
     let layerPoly = CAShapeLayer()
     var elements = [SNPathElement]()
     var corners = [Bool]()
-    let radius = 20.0 as CGFloat
+    let radius = 22.0 as CGFloat
     let baseTag = 100
     var indexDragging:Int?
     var offset = CGPoint.zero
@@ -53,38 +53,6 @@ class VectorEditor: UIViewController {
         assert(corners.count == elements.count)
     }
     
-    func pinch(recognizer:UIPinchGestureRecognizer) {
-        switch(recognizer.state) {
-        case .Began:
-            transformLast = viewMain.transform
-        case .Changed:
-            viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
-        case .Ended:
-            break
-        default:
-            viewMain.transform = transformLast
-        }
-    }
-    
-    func pan(recognizer:UIPanGestureRecognizer) {
-        if recognizer.numberOfTouches() != 2 {
-            return
-        }
-        let pt = recognizer.locationInView(view)
-        let delta = pt.delta(locationLast)
-        switch(recognizer.state) {
-        case .Began:
-            transformLast = viewMain.transform
-            locationLast = pt
-        case .Changed:
-            viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
-        case .Ended:
-            break
-        default:
-            viewMain.transform = transformLast
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -150,9 +118,44 @@ class VectorEditor: UIViewController {
     }
 }
 
-// MARK: panNode
+// MARK: pan
 
 extension VectorEditor {
+    func pinch(recognizer:UIPinchGestureRecognizer) {
+        switch(recognizer.state) {
+        case .Began:
+            transformLast = viewMain.transform
+        case .Changed:
+            viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+            var xf = CGAffineTransformInvert(viewMain.transform)
+            xf.tx = 0; xf.ty = 0
+            viewMain.subviews.forEach { $0.transform = xf }
+        case .Ended:
+            break
+        default:
+            viewMain.transform = transformLast
+        }
+    }
+    
+    func pan(recognizer:UIPanGestureRecognizer) {
+        if recognizer.numberOfTouches() != 2 {
+            return
+        }
+        let pt = recognizer.locationInView(view)
+        let delta = pt.delta(locationLast)
+        switch(recognizer.state) {
+        case .Began:
+            transformLast = viewMain.transform
+            locationLast = pt
+        case .Changed:
+            viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+        case .Ended:
+            break
+        default:
+            viewMain.transform = transformLast
+        }
+    }
+
     func panNode(recognizer:UIPanGestureRecognizer) {
         guard let subview = recognizer.view else {
             return
