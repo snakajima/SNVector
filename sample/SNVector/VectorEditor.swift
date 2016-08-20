@@ -143,7 +143,7 @@ extension VectorEditor {
             frame.origin.y += viewMain.frame.origin.y
             mc.setTargetRect(frame, inView: view)
             var menuItems = [UIMenuItem]()
-            if elements.count > 2 {
+            if elements.count > 1 {
                 menuItems.append(UIMenuItem(title: "Delete", action: #selector(VectorEditor.deleteNode(_:))))
             }
             menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(VectorEditor.duplicateNode(_:))))
@@ -211,7 +211,16 @@ extension VectorEditor {
             } else {
                 switch(indexTapped - baseTag) {
                 case let index where index == 0:
-                    print("first item 2")
+                    switch(elements[index + 1]) {
+                    case let line as SNLine:
+                        adjustSubviewTagAbove(index)
+                        elements.removeAtIndex(index)
+                        corners.removeAtIndex(index)
+                        elements[index] = SNMove(pt: line.pt)
+                        viewNode.removeFromSuperview()
+                    default:
+                        print("not supported 8")
+                    }
                 case let index where index == elements.count-1:
                     switch(elements[index]) {
                     case let quad as SNQuadCurve:
