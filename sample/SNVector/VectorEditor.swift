@@ -173,7 +173,6 @@ extension VectorEditor {
                             switch(elements[index-1]) {
                             case let prev as SNQuadCurve:
                                 if corners[index-1] {
-                                    print("between two corners")
                                     elements[index] = SNLine(pt: quad.pt)
                                     viewNode.removeFromSuperview()
                                 } else {
@@ -184,10 +183,12 @@ extension VectorEditor {
                                     elements[index-1] = SNQuadCurve(cp: prev.cp, pt: quad.pt)
                                     corners[index-1] = true
                                 }
-                            case let prev as SNLine:
-                                print("prev is line")
-                            case let prev as SNMove:
-                                print("prev is move")
+                            case _ as SNLine:
+                                elements[index] = SNLine(pt: quad.pt)
+                                viewNode.removeFromSuperview()
+                            case _ as SNMove:
+                                elements[index] = SNLine(pt: quad.pt)
+                                viewNode.removeFromSuperview()
                             default:
                                 print("prev is not supported")
                             }
