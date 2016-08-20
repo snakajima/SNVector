@@ -152,6 +152,15 @@ extension VectorEditor {
         print("Delete Node")
         if let viewNode = viewMain.viewWithTag(indexTapped + baseTag) {
             print("Delete Node", viewNode)
+            
+            func adjustSubviewTagAbove(index:Int) {
+                for subview in viewMain.subviews {
+                    if (subview.tag % baseTag) > index {
+                        subview.tag = subview.tag - 1
+                    }
+                }
+            }
+            
             if indexTapped < elements.count {
                 switch(indexTapped) {
                 case let index where index == 0:
@@ -160,12 +169,22 @@ extension VectorEditor {
                     break
                 case let index:
                     if corners[index] {
-                    } else {
-                        for subview in viewMain.subviews {
-                            if (subview.tag % baseTag) > index {
-                                subview.tag = subview.tag - 1
+                        if let quad = elements[index] as? SNQuadCurve {
+                            if let prev = elements[index-1] as? SNQuadCurve {
+                                if corners[index] {
+                                    // two corners
+                                } else {
+                                    adjustSubviewTagAbove(index-1)
+                                    elements.removeAtIndex(index)
+                                    corners.removeAtIndex(index)
+                                    viewNode.removeFromSuperview()
+                                    elements[index-1] = SNQuadCurve(cp: prev.cp, pt: quad.pt)
+                                    corners[index-1] = true
+                                }
                             }
                         }
+                    } else {
+                        adjustSubviewTagAbove(index)
                         elements.removeAtIndex(index)
                         corners.removeAtIndex(index)
                         viewNode.removeFromSuperview()
