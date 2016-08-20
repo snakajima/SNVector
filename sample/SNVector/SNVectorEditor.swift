@@ -78,6 +78,16 @@ class SNVectorEditor: UIViewController {
             }
         }
     }
+    
+    func prepareNode(node:SNNodeView) {
+        let panNode = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.panNode))
+        panNode.minimumNumberOfTouches = 1
+        panNode.maximumNumberOfTouches = 1
+        node.addGestureRecognizer(panNode)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(SNVectorEditor.tapNode))
+        node.addGestureRecognizer(tap)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,21 +103,14 @@ class SNVectorEditor: UIViewController {
         findCorners()
         viewMain.layer.addSublayer(layerPoly)
         viewMain.layer.addSublayer(layerCurve)
-
+        
         func addNodeViewAt(pt:CGPoint, corner:Bool) {
             let node = SNNodeView()
             node.corner = corner
             viewMain.addSubview(node)
             node.center = pt
             nodes.append(node)
-
-            let panNode = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.panNode))
-            panNode.minimumNumberOfTouches = 1
-            panNode.maximumNumberOfTouches = 1
-            node.addGestureRecognizer(panNode)
-            
-            let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
-            node.addGestureRecognizer(tap)
+            prepareNode(node)
         }
         
         for (index, element) in elements.enumerate() {
@@ -181,6 +184,16 @@ class SNVectorEditor: UIViewController {
 
     func duplicateNode(menuController: UIMenuController) {
         print("Duplicate Node")
+        if let node = nodeTapped, let index = nodes.indexOf(node) {
+            let nodeCopy = SNNodeView()
+            nodeCopy.corner = node.corner
+            nodeCopy.center = node.center
+            prepareNode(nodeCopy)
+            nodes.insert(nodeCopy, atIndex: index + 1)
+            viewMain.insertSubview(nodeCopy, aboveSubview: node)
+            updateElements()
+            updateCurve()
+        }
     }
     
     func flipNode(menuController: UIMenuController) {
