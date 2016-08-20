@@ -15,9 +15,9 @@ class VectorEditor: UIViewController {
     var elements = [SNPathElement]()
     var corners = [Bool]()
     let radius = 22.0 as CGFloat
-    let baseTag = 100
+    let baseTag = 1000
     var indexDragging:Int?
-    var tagTapped = 0 // transient for UIMenuController
+    var indexTapped = 0 // transient for UIMenuController
     var offset = CGPoint.zero
     var transformLast = CGAffineTransformIdentity
     var locationLast = CGPoint.zero
@@ -94,7 +94,7 @@ class VectorEditor: UIViewController {
         func addAnchorViewAt(pt:CGPoint, index:Int) {
             let subview = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
             subview.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
-            subview.tag = baseTag + index + elements.count
+            subview.tag = baseTag * 2 + index
             viewMain.addSubview(subview)
             subview.center = pt
             addGestureRecognizers(subview)
@@ -130,7 +130,7 @@ extension VectorEditor {
 
     func tapNode(recognizer:UITapGestureRecognizer) {
         if let subview = recognizer.view {
-            tagTapped = subview.tag - baseTag
+            indexTapped = subview.tag - baseTag
             viewMain.becomeFirstResponder()
             
             let index = subview.tag - baseTag
@@ -147,13 +147,37 @@ extension VectorEditor {
         }
     }
     
+    
     func deleteNode(menuController: UIMenuController) {
         print("Delete Node")
-        if let subview = viewMain.viewWithTag(tagTapped + baseTag) {
-            print("Delete Node", subview)
-            if tagTapped < elements.count {
+        if let viewNode = viewMain.viewWithTag(indexTapped + baseTag) {
+            print("Delete Node", viewNode)
+            if indexTapped < elements.count {
+                switch(indexTapped) {
+                case let index where index == 0:
+                    break
+                case let index where index == elements.count-1:
+                    break
+                case let index:
+                    if corners[index] {
+                    } else {
+                        for subview in viewMain.subviews {
+                            if (subview.tag % baseTag) > index {
+                                subview.tag = subview.tag - 1
+                            }
+                        }
+                        elements.removeAtIndex(index)
+                        corners.removeAtIndex(index)
+                        viewNode.removeFromSuperview()
+                        if !corners[index-1], let prev = elements[index - 1] as? SNQuadCurve {
+                            if let next = elements[index] as? SNQuadCurve {
+                                elements[index-1] = SNQuadCurve(cp: prev.cp, pt: prev.cp.middle(next.cp))
+                            }
+                        }
+                    }
+                }
             } else {
-                switch(tagTapped - elements.count) {
+                switch(indexTapped - baseTag) {
                 case let index where index == 0:
                     break
                 case let index where index == elements.count-1:
@@ -164,7 +188,7 @@ extension VectorEditor {
                         case let quadNext as SNQuadCurve:
                             elements[index] = SNQuadCurve(cp: quad.cp, pt: quad.cp.middle(quadNext.cp))
                             corners[index] = false
-                            subview.removeFromSuperview()
+                            viewNode.removeFromSuperview()
                         default:
                             break
                         }
@@ -220,7 +244,7 @@ extension VectorEditor {
             viewMain.transform = transformLast
         }
     }
-
+    
     func panNode(recognizer:UIPanGestureRecognizer) {
         guard let subview = recognizer.view else {
             return
@@ -250,7 +274,7 @@ extension VectorEditor {
                         break
                     }
                 } else {
-                    index -= elements.count
+                    index -= baseTag
                     assert(index < elements.count)
                     switch(elements[index]) {
                     case let quad as SNQuadCurve:
