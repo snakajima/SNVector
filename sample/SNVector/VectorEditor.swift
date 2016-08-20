@@ -226,7 +226,10 @@ extension VectorEditor {
                             break
                         }
                     case _ as SNLine:
-                        print("deleting line")
+                        adjustSubviewTagAbove(index)
+                        elements.removeAtIndex(index)
+                        corners.removeAtIndex(index)
+                        viewNode.removeFromSuperview()
                     default:
                         print("not supported 4")
                     }
