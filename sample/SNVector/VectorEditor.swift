@@ -17,6 +17,7 @@ class VectorEditor: UIViewController {
     let radius = 22.0 as CGFloat
     let baseTag = 100
     var indexDragging:Int?
+    var tagTapped = 0 // transient for UIMenuController
     var offset = CGPoint.zero
     var transformLast = CGAffineTransformIdentity
     var locationLast = CGPoint.zero
@@ -129,6 +130,7 @@ extension VectorEditor {
 
     func tapNode(recognizer:UITapGestureRecognizer) {
         if let subview = recognizer.view {
+            tagTapped = subview.tag - baseTag
             viewMain.becomeFirstResponder()
             
             let index = subview.tag - baseTag
@@ -138,14 +140,47 @@ extension VectorEditor {
             var frame = CGRectApplyAffineTransform(subview.frame, viewMain.transform)
             frame.origin.y += viewMain.frame.origin.y
             mc.setTargetRect(frame, inView: view)
-            let menu1 = UIMenuItem(title: "hello1", action: #selector(VectorEditor.hello))
-            let menu2 = UIMenuItem(title: "hello2", action: #selector(VectorEditor.hello))
+            let menu1 = UIMenuItem(title: "Delete", action: #selector(VectorEditor.deleteNode(_:)))
+            let menu2 = UIMenuItem(title: "Duplicate", action: #selector(VectorEditor.duplicateNode(_:)))
             mc.menuItems = [menu1, menu2]
             mc.menuVisible = true
         }
     }
     
-    func hello(menuController: UIMenuController) {
+    func deleteNode(menuController: UIMenuController) {
+        print("Delete Node")
+        if let subview = viewMain.viewWithTag(tagTapped + baseTag) {
+            print("Delete Node", subview)
+            if tagTapped < elements.count {
+            } else {
+                switch(tagTapped - elements.count) {
+                case let index where index == 0:
+                    break
+                case let index where index == elements.count-1:
+                    break
+                case let index where index < elements.count:
+                    if let quad = elements[index] as? SNQuadCurve {
+                        switch(elements[index + 1]) {
+                        case let quadNext as SNQuadCurve:
+                            elements[index] = SNQuadCurve(cp: quad.cp, pt: quad.cp.middle(quadNext.cp))
+                            corners[index] = false
+                            subview.removeFromSuperview()
+                        default:
+                            break
+                        }
+                    }
+                    break
+                default:
+                    assert(false)
+                }
+            }
+            updateCurve()
+        }
+    }
+    func duplicateNode(menuController: UIMenuController) {
+        print("Duplicate Node")
+    }
+    func turnNode(menuController: UIMenuController) {
         print("hello")
     }
 
