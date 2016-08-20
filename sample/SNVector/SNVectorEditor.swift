@@ -17,6 +17,8 @@ class SNVectorEditor: UIViewController {
     var nodes = [SNNodeView]()
     let radius = 22.0 as CGFloat
 
+    var offset = CGPoint.zero // transient for panNode
+
     private func updateCurve() {
         layerCurve.path = SNPath.pathFrom(elements)
         layerCurve.lineWidth = 3
@@ -71,8 +73,8 @@ class SNVectorEditor: UIViewController {
             panNode.maximumNumberOfTouches = 1
             subview.addGestureRecognizer(panNode)
             
-            let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
-            subview.addGestureRecognizer(tap)
+            //let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
+            //subview.addGestureRecognizer(tap)
         }
         
         func addControlViewAt(pt:CGPoint, index:Int) {
@@ -83,7 +85,7 @@ class SNVectorEditor: UIViewController {
             viewMain.insertSubview(subview, atIndex: 0)
             subview.center = pt
             nodes.append(subview)
-            //addGestureRecognizers(subview)
+            addGestureRecognizers(subview)
         }
     
         func addAnchorViewAt(pt:CGPoint, index:Int) {
@@ -92,7 +94,7 @@ class SNVectorEditor: UIViewController {
             viewMain.addSubview(subview)
             subview.center = pt
             nodes.append(subview)
-            //addGestureRecognizers(subview)
+            addGestureRecognizers(subview)
         }
         
         for (index, element) in elements.enumerate() {
@@ -114,9 +116,55 @@ class SNVectorEditor: UIViewController {
 
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func panNode(recognizer:UIPanGestureRecognizer) {
+        guard let subview = recognizer.view else {
+            return
+        }
+        let pt = recognizer.locationInView(viewMain)
+        switch(recognizer.state) {
+        case .Began:
+            //indexDragging = subview.tag - baseTag
+            offset = pt.delta(subview.center)
+            UIMenuController.sharedMenuController().menuVisible = false
+        case .Changed:
+            let cp = pt.delta(offset)
+            subview.center = cp
+            /*
+                if index < elements.count {
+                    switch(elements[index]) {
+                    case let quad as SNQuadCurve:
+                        if index > 0 && !corners[index-1], let prev = elements[index-1] as? SNQuadCurve {
+                            elements[index-1] = SNQuadCurve(cp: prev.cp, pt: prev.cp.middle(cp))
+                        }
+                        if index+1 < elements.count && !corners[index], let next = elements[index+1] as? SNQuadCurve {
+                            elements[index] = SNQuadCurve(cp: cp, pt: cp.middle(next.cp))
+                        } else {
+                            elements[index] = SNQuadCurve(cp: cp, pt: quad.pt)
+                        }
+                    default:
+                        print("unsupported 1")
+                    }
+                } else {
+                    index -= baseTag
+                    assert(index < elements.count)
+                    switch(elements[index]) {
+                    case let quad as SNQuadCurve:
+                        elements[index] = SNQuadCurve(cp: quad.cp, pt: cp)
+                    case _ as SNMove:
+                        elements[index] = SNMove(pt: cp)
+                    case _ as SNLine:
+                        elements[index] = SNLine(pt: cp)
+                    default:
+                        print("unsupported 2")
+                    }
+                }
+                updateCurve()
+            */
+        case .Ended:
+            //indexDragging = nil
+            break
+        default:
+            break
+        }
     }
-
 }
