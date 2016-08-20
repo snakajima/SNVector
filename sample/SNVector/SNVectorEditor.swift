@@ -50,6 +50,30 @@ class SNVectorEditor: UIViewController {
         corners.append(true)
         assert(corners.count == elements.count)
     }
+    
+    private func updateElements() {
+        elements.removeAll()
+        var prev:SNNodeView?
+        for (i, node) in nodes.enumerate() {
+            if i==0 {
+                elements.append(SNMove(pt: node.center))
+            } else if node.corner {
+                if let prev = prev {
+                    elements.append(SNQuadCurve(cp: prev.center, pt: node.center))
+                } else {
+                    elements.append(SNLine(pt: node.center))
+                }
+                prev = nil
+            } else {
+                if let prev = prev {
+                    elements.append(SNQuadCurve(cp: prev.center, pt: prev.center.middle(node.center)))
+                } else {
+                    // skip
+                }
+                prev = node
+            }
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,6 +114,7 @@ class SNVectorEditor: UIViewController {
     
         func addAnchorViewAt(pt:CGPoint, index:Int) {
             let subview = SNNodeView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
+            subview.corner = true
             subview.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
             viewMain.addSubview(subview)
             subview.center = pt
@@ -158,8 +183,9 @@ class SNVectorEditor: UIViewController {
                         print("unsupported 2")
                     }
                 }
-                updateCurve()
             */
+            updateElements()
+            updateCurve()
         case .Ended:
             //indexDragging = nil
             break

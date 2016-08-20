@@ -9,5 +9,5 @@
 import UIKit
 
 class SNNodeView: UIView {
-    
+    var corner = false
 }
