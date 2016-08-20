@@ -72,7 +72,7 @@ class SNVectorEditor: UIViewController {
                 if let prev = prev {
                     elements.append(SNQuadCurve(cp: prev.center, pt: prev.center.middle(node.center)))
                 } else {
-                    // skip
+                    // no need to add this case
                 }
                 prev = node
             }
@@ -94,35 +94,32 @@ class SNVectorEditor: UIViewController {
         viewMain.layer.addSublayer(layerPoly)
         viewMain.layer.addSublayer(layerCurve)
 
-        func addGestureRecognizers(subview:UIView) {
-            let panNode = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.panNode))
-            panNode.minimumNumberOfTouches = 1
-            panNode.maximumNumberOfTouches = 1
-            subview.addGestureRecognizer(panNode)
-            
-            let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
-            subview.addGestureRecognizer(tap)
-        }
-        
-        func addNodeViewAt(pt:CGPoint, index:Int, corner:Bool) {
+        func addNodeViewAt(pt:CGPoint, corner:Bool) {
             let node = SNNodeView()
             node.corner = corner
             viewMain.addSubview(node)
             node.center = pt
             nodes.append(node)
-            addGestureRecognizers(node)
+
+            let panNode = UIPanGestureRecognizer(target: self, action: #selector(VectorEditor.panNode))
+            panNode.minimumNumberOfTouches = 1
+            panNode.maximumNumberOfTouches = 1
+            node.addGestureRecognizer(panNode)
+            
+            let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
+            node.addGestureRecognizer(tap)
         }
         
         for (index, element) in elements.enumerate() {
             switch(element) {
             case let move as SNMove:
-                addNodeViewAt(move.pt, index:index, corner:true)
+                addNodeViewAt(move.pt, corner:true)
             case let line as SNLine:
-                addNodeViewAt(line.pt, index:index, corner:true)
+                addNodeViewAt(line.pt, corner:true)
             case let quad as SNQuadCurve:
-                addNodeViewAt(quad.cp, index:index, corner:false)
+                addNodeViewAt(quad.cp, corner:false)
                 if corners[index] {
-                    addNodeViewAt(quad.pt, index: index, corner:true)
+                    addNodeViewAt(quad.pt, corner:true)
                 }
             default:
                 print("unsupported 0")
@@ -139,7 +136,6 @@ class SNVectorEditor: UIViewController {
         let pt = recognizer.locationInView(viewMain)
         switch(recognizer.state) {
         case .Began:
-            //indexDragging = subview.tag - baseTag
             offset = pt.delta(subview.center)
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
@@ -147,9 +143,6 @@ class SNVectorEditor: UIViewController {
             subview.center = cp
             updateElements()
             updateCurve()
-        case .Ended:
-            //indexDragging = nil
-            break
         default:
             break
         }
@@ -164,12 +157,12 @@ class SNVectorEditor: UIViewController {
             frame.origin.y += viewMain.frame.origin.y
             mc.setTargetRect(frame, inView: view)
             var menuItems = [UIMenuItem]()
-            if elements.count > 1 {
-                menuItems.append(UIMenuItem(title: "Delete", action: #selector(SNVectorEditor.deleteNode(_:))))
-            }
-            menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(SNVectorEditor.duplicateNode(_:))))
             if node != nodes.first && node != nodes.last {
                 menuItems.append(UIMenuItem(title: "Flip", action: #selector(SNVectorEditor.flipNode(_:))))
+            }
+            menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(SNVectorEditor.duplicateNode(_:))))
+            if elements.count > 1 {
+                menuItems.append(UIMenuItem(title: "Delete", action: #selector(SNVectorEditor.deleteNode(_:))))
             }
             mc.menuItems = menuItems
             mc.menuVisible = true
