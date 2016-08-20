@@ -165,8 +165,6 @@ extension VectorEditor {
                 switch(indexTapped) {
                 case let index where index == 0:
                     print("first item")
-                case let index where index == elements.count-1:
-                    print("last item")
                 case let index:
                     if corners[index] {
                         if let quad = elements[index] as? SNQuadCurve {
