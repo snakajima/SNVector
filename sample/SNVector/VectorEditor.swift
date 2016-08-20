@@ -142,19 +142,19 @@ extension VectorEditor {
             var frame = CGRectApplyAffineTransform(subview.frame, viewMain.transform)
             frame.origin.y += viewMain.frame.origin.y
             mc.setTargetRect(frame, inView: view)
-            let menu1 = UIMenuItem(title: "Delete", action: #selector(VectorEditor.deleteNode(_:)))
-            let menu2 = UIMenuItem(title: "Duplicate", action: #selector(VectorEditor.duplicateNode(_:)))
-            mc.menuItems = [menu1, menu2]
+            var menuItems = [UIMenuItem]()
+            if elements.count > 2 {
+                menuItems.append(UIMenuItem(title: "Delete", action: #selector(VectorEditor.deleteNode(_:))))
+            }
+            menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(VectorEditor.duplicateNode(_:))))
+            mc.menuItems = menuItems
             mc.menuVisible = true
         }
     }
     
     
     func deleteNode(menuController: UIMenuController) {
-        print("Delete Node")
         if let viewNode = viewMain.viewWithTag(indexTapped + baseTag) {
-            print("Delete Node", viewNode)
-            
             func adjustSubviewTagAbove(index:Int) {
                 for subview in viewMain.subviews {
                     if (subview.tag % baseTag) > index {
@@ -213,7 +213,26 @@ extension VectorEditor {
                 case let index where index == 0:
                     print("first item 2")
                 case let index where index == elements.count-1:
-                    print("last item 2")
+                    switch(elements[index]) {
+                    case let quad as SNQuadCurve:
+                        guard let subview = viewMain.viewWithTag(baseTag + index) else {
+                            assert(false)
+                            return
+                        }
+                        if corners[index-1] {
+                            elements[index] = SNLine(pt: quad.cp)
+                            viewNode.center = quad.cp
+                            subview.removeFromSuperview()
+                        } else {
+                            print("not suppported 7")
+                        }
+                    case _ as SNLine:
+                        elements.removeAtIndex(index)
+                        corners.removeAtIndex(index)
+                        viewNode.removeFromSuperview()
+                    default:
+                        print("not supported 6")
+                    }
                 case let index where index < elements.count:
                     switch(elements[index]) {
                     case let quad as SNQuadCurve:
