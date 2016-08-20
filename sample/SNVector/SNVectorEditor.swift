@@ -18,6 +18,7 @@ class SNVectorEditor: UIViewController {
     let radius = 22.0 as CGFloat
 
     var offset = CGPoint.zero // transient for panNode
+    var nodeTapped:SNNodeView? // transient for panTapped
 
     private func updateCurve() {
         layerCurve.path = SNPath.pathFrom(elements)
@@ -97,8 +98,8 @@ class SNVectorEditor: UIViewController {
             panNode.maximumNumberOfTouches = 1
             subview.addGestureRecognizer(panNode)
             
-            //let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
-            //subview.addGestureRecognizer(tap)
+            let tap = UITapGestureRecognizer(target: self, action: #selector(VectorEditor.tapNode))
+            subview.addGestureRecognizer(tap)
         }
         
         func addControlViewAt(pt:CGPoint, index:Int) {
@@ -154,36 +155,6 @@ class SNVectorEditor: UIViewController {
         case .Changed:
             let cp = pt.delta(offset)
             subview.center = cp
-            /*
-                if index < elements.count {
-                    switch(elements[index]) {
-                    case let quad as SNQuadCurve:
-                        if index > 0 && !corners[index-1], let prev = elements[index-1] as? SNQuadCurve {
-                            elements[index-1] = SNQuadCurve(cp: prev.cp, pt: prev.cp.middle(cp))
-                        }
-                        if index+1 < elements.count && !corners[index], let next = elements[index+1] as? SNQuadCurve {
-                            elements[index] = SNQuadCurve(cp: cp, pt: cp.middle(next.cp))
-                        } else {
-                            elements[index] = SNQuadCurve(cp: cp, pt: quad.pt)
-                        }
-                    default:
-                        print("unsupported 1")
-                    }
-                } else {
-                    index -= baseTag
-                    assert(index < elements.count)
-                    switch(elements[index]) {
-                    case let quad as SNQuadCurve:
-                        elements[index] = SNQuadCurve(cp: quad.cp, pt: cp)
-                    case _ as SNMove:
-                        elements[index] = SNMove(pt: cp)
-                    case _ as SNLine:
-                        elements[index] = SNLine(pt: cp)
-                    default:
-                        print("unsupported 2")
-                    }
-                }
-            */
             updateElements()
             updateCurve()
         case .Ended:
@@ -192,5 +163,41 @@ class SNVectorEditor: UIViewController {
         default:
             break
         }
+    }
+    
+    func tapNode(recognizer:UITapGestureRecognizer) {
+        if let node = recognizer.view as? SNNodeView {
+            nodeTapped = node
+            node.becomeFirstResponder()
+            let mc = UIMenuController.sharedMenuController()
+            var frame = CGRectApplyAffineTransform(node.frame, viewMain.transform)
+            frame.origin.y += viewMain.frame.origin.y
+            mc.setTargetRect(frame, inView: view)
+            var menuItems = [UIMenuItem]()
+            if elements.count > 1 {
+                menuItems.append(UIMenuItem(title: "Delete", action: #selector(VectorEditor.deleteNode(_:))))
+            }
+            menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(VectorEditor.duplicateNode(_:))))
+            mc.menuItems = menuItems
+            mc.menuVisible = true
+        }
+    }
+
+    func deleteNode(menuController: UIMenuController) {
+        print("Delete Node")
+        if let node = nodeTapped, let index = nodes.indexOf(node) {
+            node.removeFromSuperview()
+            nodes.removeAtIndex(index)
+            updateElements()
+            updateCurve()
+        }
+    }
+
+    func duplicateNode(menuController: UIMenuController) {
+        print("Duplicate Node")
+    }
+    
+    func flipNode(menuController: UIMenuController) {
+        print("Flip Node")
     }
 }

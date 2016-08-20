@@ -10,4 +10,7 @@ import UIKit
 
 class SNNodeView: UIView {
     var corner = false
+    override func canBecomeFirstResponder() -> Bool {
+        return true
+    }
 }
