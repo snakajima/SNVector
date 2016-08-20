@@ -163,9 +163,12 @@ class SNVectorEditor: UIViewController {
             mc.setTargetRect(frame, inView: view)
             var menuItems = [UIMenuItem]()
             if elements.count > 1 {
-                menuItems.append(UIMenuItem(title: "Delete", action: #selector(VectorEditor.deleteNode(_:))))
+                menuItems.append(UIMenuItem(title: "Delete", action: #selector(SNVectorEditor.deleteNode(_:))))
             }
-            menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(VectorEditor.duplicateNode(_:))))
+            menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(SNVectorEditor.duplicateNode(_:))))
+            if node != nodes.first && node != nodes.last {
+                menuItems.append(UIMenuItem(title: "Flip", action: #selector(SNVectorEditor.flipNode(_:))))
+            }
             mc.menuItems = menuItems
             mc.menuVisible = true
         }
@@ -187,5 +190,10 @@ class SNVectorEditor: UIViewController {
     
     func flipNode(menuController: UIMenuController) {
         print("Flip Node")
+        if let node = nodeTapped {
+            node.corner = !node.corner
+            updateElements()
+            updateCurve()
+        }
     }
 }
