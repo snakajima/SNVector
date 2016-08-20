@@ -223,7 +223,7 @@ extension VectorEditor {
                             corners[index] = false
                             viewNode.removeFromSuperview()
                         default:
-                            break
+                            print("not supported 5")
                         }
                     case _ as SNLine:
                         adjustSubviewTagAbove(index)
