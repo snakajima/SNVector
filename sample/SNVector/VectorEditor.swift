@@ -217,15 +217,21 @@ extension VectorEditor {
                     case let quad as SNQuadCurve:
                         guard let subview = viewMain.viewWithTag(baseTag + index) else {
                             assert(false)
-                            return
                         }
                         if corners[index-1] {
                             elements[index] = SNLine(pt: quad.cp)
-                            viewNode.center = quad.cp
-                            subview.removeFromSuperview()
                         } else {
-                            print("not suppported 7")
+                            guard let prev = elements[index-1] as? SNQuadCurve else {
+                                assert(false)
+                            }
+                            elements[index-1] = SNQuadCurve(cp: prev.cp, pt: quad.cp)
+                            elements.removeLast()
+                            corners.removeLast()
+                            corners[elements.count - 1] = true
+                            viewNode.tag = baseTag * 2 + elements.count - 1
                         }
+                        viewNode.center = quad.cp
+                        subview.removeFromSuperview()
                     case _ as SNLine:
                         elements.removeAtIndex(index)
                         corners.removeAtIndex(index)
