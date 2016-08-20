@@ -104,13 +104,15 @@ class VectorEditor: UIViewController {
             switch(element) {
             case let move as SNMove:
                 addAnchorViewAt(move.pt, index:index)
+            case let line as SNLine:
+                addAnchorViewAt(line.pt, index:index)
             case let quad as SNQuadCurve:
                 addControlViewAt(quad.cp, index:index)
                 if corners[index] {
                     addAnchorViewAt(quad.pt, index: index)
                 }
             default:
-                break
+                print("unsupported 0")
             }
         }
     }
@@ -168,7 +170,8 @@ extension VectorEditor {
                 case let index:
                     if corners[index] {
                         if let quad = elements[index] as? SNQuadCurve {
-                            if let prev = elements[index-1] as? SNQuadCurve {
+                            switch(elements[index-1]) {
+                            case let prev as SNQuadCurve:
                                 if corners[index-1] {
                                     print("between two corners")
                                     elements[index] = SNLine(pt: quad.pt)
@@ -181,8 +184,12 @@ extension VectorEditor {
                                     elements[index-1] = SNQuadCurve(cp: prev.cp, pt: quad.pt)
                                     corners[index-1] = true
                                 }
-                            } else {
-                                print("prev is not quad")
+                            case let prev as SNLine:
+                                print("prev is line")
+                            case let prev as SNMove:
+                                print("prev is move")
+                            default:
+                                print("prev is not supported")
                             }
                         }
                     } else {
