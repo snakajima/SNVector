@@ -171,6 +171,8 @@ extension VectorEditor {
                             if let prev = elements[index-1] as? SNQuadCurve {
                                 if corners[index-1] {
                                     print("between two corners")
+                                    elements[index] = SNLine(pt: quad.pt)
+                                    viewNode.removeFromSuperview()
                                 } else {
                                     adjustSubviewTagAbove(index-1)
                                     elements.removeAtIndex(index)
@@ -290,7 +292,7 @@ extension VectorEditor {
                             elements[index] = SNQuadCurve(cp: cp, pt: quad.pt)
                         }
                     default:
-                        break
+                        print("unsupported 1")
                     }
                 } else {
                     index -= baseTag
@@ -300,8 +302,10 @@ extension VectorEditor {
                         elements[index] = SNQuadCurve(cp: quad.cp, pt: cp)
                     case _ as SNMove:
                         elements[index] = SNMove(pt: cp)
+                    case _ as SNLine:
+                        elements[index] = SNLine(pt: cp)
                     default:
-                        break
+                        print("unsupported 2")
                     }
                 }
                 updateCurve()
