@@ -55,11 +55,13 @@ class SNVectorEditor: UIViewController {
     }
     
     private func updateElements() {
+        nodes.first!.corner = true
+        nodes.last!.corner = true
+
         elements.removeAll()
         var prev:SNNodeView?
         for (i, node) in nodes.enumerate() {
             if i==0 {
-                node.corner = true
                 elements.append(SNMove(pt: node.center))
             } else if node.corner {
                 if let prev = prev {
