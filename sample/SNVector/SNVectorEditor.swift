@@ -16,8 +16,11 @@ class SNVectorEditor: UIViewController {
     var corners = [Bool]()
     var nodes = [SNNodeView]()
 
-    var offset = CGPoint.zero // transient for panNode
-    var nodeTapped:SNNodeView? // transient for panTapped
+    // Transient
+    var offset = CGPoint.zero // for panNode
+    var nodeTapped:SNNodeView? // for panTapped
+    var transformLast = CGAffineTransformIdentity // for pinch & pan
+    var locationLast = CGPoint.zero // pan
 
     private func updateCurve() {
         layerCurve.path = SNPath.pathFrom(elements)
@@ -79,14 +82,13 @@ class SNVectorEditor: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-/*
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(SNVectorEditor.pinch))
         view.addGestureRecognizer(pinch)
         let pan = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.pan))
         pan.minimumNumberOfTouches = 2
         pan.maximumNumberOfTouches = 2
         view.addGestureRecognizer(pan)
-*/
+
         updateCurve()
         findCorners()
         viewMain.layer.addSublayer(layerPoly)
@@ -194,6 +196,43 @@ class SNVectorEditor: UIViewController {
             node.corner = !node.corner
             updateElements()
             updateCurve()
+        }
+    }
+
+    func pinch(recognizer:UIPinchGestureRecognizer) {
+        switch(recognizer.state) {
+        case .Began:
+            transformLast = viewMain.transform
+            UIMenuController.sharedMenuController().menuVisible = false
+        case .Changed:
+            viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+            var xf = CGAffineTransformInvert(viewMain.transform)
+            xf.tx = 0; xf.ty = 0
+            nodes.forEach { $0.transform = xf }
+        case .Ended:
+            break
+        default:
+            viewMain.transform = transformLast
+        }
+    }
+    
+    func pan(recognizer:UIPanGestureRecognizer) {
+        if recognizer.numberOfTouches() != 2 {
+            return
+        }
+        let pt = recognizer.locationInView(view)
+        let delta = pt.delta(locationLast)
+        switch(recognizer.state) {
+        case .Began:
+            transformLast = viewMain.transform
+            locationLast = pt
+            UIMenuController.sharedMenuController().menuVisible = false
+        case .Changed:
+            viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+        case .Ended:
+            break
+        default:
+            viewMain.transform = transformLast
         }
     }
 }
