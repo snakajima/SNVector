@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7440D0321D68FEE8002814F2 /* SNVectorEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7440D0311D68FEE8002814F2 /* SNVectorEditor.swift */; };
+		7440D0341D68FF2D002814F2 /* SNNodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7440D0331D68FF2D002814F2 /* SNNodeView.swift */; };
 		74F4137F1D63DA04006F765E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4137E1D63DA04006F765E /* AppDelegate.swift */; };
 		74F413811D63DA04006F765E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F413801D63DA04006F765E /* ViewController.swift */; };
 		74F413841D63DA04006F765E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74F413821D63DA04006F765E /* Main.storyboard */; };
@@ -19,6 +21,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7440D0311D68FEE8002814F2 /* SNVectorEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNVectorEditor.swift; sourceTree = "<group>"; };
+		7440D0331D68FF2D002814F2 /* SNNodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNNodeView.swift; sourceTree = "<group>"; };
 		74F4137B1D63DA04006F765E /* SNVector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNVector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74F4137E1D63DA04006F765E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74F413801D63DA04006F765E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -66,6 +70,8 @@
 			isa = PBXGroup;
 			children = (
 				74F4139A1D640D93006F765E /* README.md */,
+				7440D0311D68FEE8002814F2 /* SNVectorEditor.swift */,
+				7440D0331D68FF2D002814F2 /* SNNodeView.swift */,
 				74F413981D63DDA7006F765E /* VectorEditor.swift */,
 				74F4137E1D63DA04006F765E /* AppDelegate.swift */,
 				74F413801D63DA04006F765E /* ViewController.swift */,
@@ -169,8 +175,10 @@
 			files = (
 				74F413961D63DAF3006F765E /* SNPathBuilder.swift in Sources */,
 				74F413811D63DA04006F765E /* ViewController.swift in Sources */,
+				7440D0321D68FEE8002814F2 /* SNVectorEditor.swift in Sources */,
 				74F413951D63DAF3006F765E /* SNPath.swift in Sources */,
 				74F413991D63DDA7006F765E /* VectorEditor.swift in Sources */,
+				7440D0341D68FF2D002814F2 /* SNNodeView.swift in Sources */,
 				74F413941D63DAF3006F765E /* SNDrawView.swift in Sources */,
 				74F4137F1D63DA04006F765E /* AppDelegate.swift in Sources */,
 			);
