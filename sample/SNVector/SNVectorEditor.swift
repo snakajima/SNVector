@@ -187,7 +187,8 @@ class SNVectorEditor: UIViewController {
         if let node = nodeTapped, let index = nodes.indexOf(node) {
             let nodeCopy = SNNodeView()
             nodeCopy.corner = node.corner
-            nodeCopy.center = node.center
+            let pt = node.center
+            nodeCopy.center = CGPoint(x: pt.x + SNNodeView.radius * 2, y: pt.y)
             prepareNode(nodeCopy)
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
