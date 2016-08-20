@@ -164,15 +164,15 @@ extension VectorEditor {
             if indexTapped < elements.count {
                 switch(indexTapped) {
                 case let index where index == 0:
-                    break
+                    print("first item")
                 case let index where index == elements.count-1:
-                    break
+                    print("last item")
                 case let index:
                     if corners[index] {
                         if let quad = elements[index] as? SNQuadCurve {
                             if let prev = elements[index-1] as? SNQuadCurve {
-                                if corners[index] {
-                                    // two corners
+                                if corners[index-1] {
+                                    print("between two corners")
                                 } else {
                                     adjustSubviewTagAbove(index-1)
                                     elements.removeAtIndex(index)
@@ -181,6 +181,8 @@ extension VectorEditor {
                                     elements[index-1] = SNQuadCurve(cp: prev.cp, pt: quad.pt)
                                     corners[index-1] = true
                                 }
+                            } else {
+                                print("prev is not quad")
                             }
                         }
                     } else {
@@ -198,9 +200,9 @@ extension VectorEditor {
             } else {
                 switch(indexTapped - baseTag) {
                 case let index where index == 0:
-                    break
+                    print("first item 2")
                 case let index where index == elements.count-1:
-                    break
+                    print("last item 2")
                 case let index where index < elements.count:
                     if let quad = elements[index] as? SNQuadCurve {
                         switch(elements[index + 1]) {
