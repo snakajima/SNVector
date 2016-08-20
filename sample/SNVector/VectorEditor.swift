@@ -223,13 +223,15 @@ extension VectorEditor {
                             assert(false)
                         }
                         if corners[index + 1] {
-                            elements[index] = SNMove(pt: next.cp)
                             elements[index+1] = SNLine(pt: next.pt)
-                            subview.removeFromSuperview()
-                            viewNode.center = next.cp
                         } else {
-                            print("not supported 9")
+                            adjustSubviewTagAbove(index)
+                            elements.removeAtIndex(index)
+                            corners.removeAtIndex(index)
                         }
+                        elements[index] = SNMove(pt: next.cp)
+                        subview.removeFromSuperview()
+                        viewNode.center = next.cp
                     default:
                         print("not supported 8")
                     }
