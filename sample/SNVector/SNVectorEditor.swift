@@ -15,7 +15,6 @@ class SNVectorEditor: UIViewController {
     var elements = [SNPathElement]()
     var corners = [Bool]()
     var nodes = [SNNodeView]()
-    let radius = 22.0 as CGFloat
 
     var offset = CGPoint.zero // transient for panNode
     var nodeTapped:SNNodeView? // transient for panTapped
@@ -57,6 +56,7 @@ class SNVectorEditor: UIViewController {
         var prev:SNNodeView?
         for (i, node) in nodes.enumerate() {
             if i==0 {
+                node.corner = true
                 elements.append(SNMove(pt: node.center))
             } else if node.corner {
                 if let prev = prev {
@@ -103,10 +103,8 @@ class SNVectorEditor: UIViewController {
         }
         
         func addControlViewAt(pt:CGPoint, index:Int) {
-            let subview = SNNodeView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
-            subview.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
-            subview.layer.cornerRadius = radius
-            subview.layer.masksToBounds = true
+            let subview = SNNodeView()
+            subview.corner = false
             viewMain.insertSubview(subview, atIndex: 0)
             subview.center = pt
             nodes.append(subview)
@@ -114,9 +112,8 @@ class SNVectorEditor: UIViewController {
         }
     
         func addAnchorViewAt(pt:CGPoint, index:Int) {
-            let subview = SNNodeView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
+            let subview = SNNodeView()
             subview.corner = true
-            subview.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
             viewMain.addSubview(subview)
             subview.center = pt
             nodes.append(subview)

@@ -9,7 +9,27 @@
 import UIKit
 
 class SNNodeView: UIView {
-    var corner = false
+    static let radius = 22.0 as CGFloat
+    var corner = false {
+        didSet {
+            if corner {
+                self.layer.cornerRadius = 0.0
+            } else {
+                self.layer.cornerRadius = SNNodeView.radius
+            }
+        }
+    }
+    
+    init() {
+        super.init(frame: CGRect(x: 0, y: 0, width: SNNodeView.radius * 2, height: SNNodeView.radius * 2))
+        self.backgroundColor = UIColor(red: 0, green: 1, blue: 0, alpha: 0.3)
+        self.layer.masksToBounds = true
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)!
+    }
+    
     override func canBecomeFirstResponder() -> Bool {
         return true
     }
