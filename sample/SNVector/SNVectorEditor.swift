@@ -102,34 +102,25 @@ class SNVectorEditor: UIViewController {
             subview.addGestureRecognizer(tap)
         }
         
-        func addControlViewAt(pt:CGPoint, index:Int) {
-            let subview = SNNodeView()
-            subview.corner = false
-            viewMain.insertSubview(subview, atIndex: 0)
-            subview.center = pt
-            nodes.append(subview)
-            addGestureRecognizers(subview)
-        }
-    
-        func addAnchorViewAt(pt:CGPoint, index:Int) {
-            let subview = SNNodeView()
-            subview.corner = true
-            viewMain.addSubview(subview)
-            subview.center = pt
-            nodes.append(subview)
-            addGestureRecognizers(subview)
+        func addNodeViewAt(pt:CGPoint, index:Int, corner:Bool) {
+            let node = SNNodeView()
+            node.corner = corner
+            viewMain.addSubview(node)
+            node.center = pt
+            nodes.append(node)
+            addGestureRecognizers(node)
         }
         
         for (index, element) in elements.enumerate() {
             switch(element) {
             case let move as SNMove:
-                addAnchorViewAt(move.pt, index:index)
+                addNodeViewAt(move.pt, index:index, corner:true)
             case let line as SNLine:
-                addAnchorViewAt(line.pt, index:index)
+                addNodeViewAt(line.pt, index:index, corner:true)
             case let quad as SNQuadCurve:
-                addControlViewAt(quad.cp, index:index)
+                addNodeViewAt(quad.cp, index:index, corner:false)
                 if corners[index] {
-                    addAnchorViewAt(quad.pt, index: index)
+                    addNodeViewAt(quad.pt, index: index, corner:true)
                 }
             default:
                 print("unsupported 0")
