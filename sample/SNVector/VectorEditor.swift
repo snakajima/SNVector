@@ -218,10 +218,16 @@ extension VectorEditor {
                     switch(elements[index]) {
                     case let quad as SNQuadCurve:
                         switch(elements[index + 1]) {
-                        case let quadNext as SNQuadCurve:
-                            elements[index] = SNQuadCurve(cp: quad.cp, pt: quad.cp.middle(quadNext.cp))
+                        case let next as SNQuadCurve:
+                            elements[index] = SNQuadCurve(cp: quad.cp, pt: quad.cp.middle(next.cp))
                             corners[index] = false
                             viewNode.removeFromSuperview()
+                        case let next as SNLine:
+                            adjustSubviewTagAbove(index)
+                            elements.removeAtIndex(index)
+                            corners.removeAtIndex(index)
+                            viewNode.removeFromSuperview()
+                            elements[index] = SNQuadCurve(cp: quad.cp, pt: next.pt)
                         default:
                             print("not supported 5")
                         }
