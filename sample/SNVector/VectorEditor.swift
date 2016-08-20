@@ -212,12 +212,24 @@ extension VectorEditor {
                 switch(indexTapped - baseTag) {
                 case let index where index == 0:
                     switch(elements[index + 1]) {
-                    case let line as SNLine:
+                    case let next as SNLine:
                         adjustSubviewTagAbove(index)
                         elements.removeAtIndex(index)
                         corners.removeAtIndex(index)
-                        elements[index] = SNMove(pt: line.pt)
+                        elements[index] = SNMove(pt: next.pt)
                         viewNode.removeFromSuperview()
+                    case let next as SNQuadCurve:
+                        guard let subview = viewMain.viewWithTag(baseTag + index + 1) else {
+                            assert(false)
+                        }
+                        if corners[index + 1] {
+                            elements[index] = SNMove(pt: next.cp)
+                            elements[index+1] = SNLine(pt: next.pt)
+                            subview.removeFromSuperview()
+                            viewNode.center = next.cp
+                        } else {
+                            print("not supported 9")
+                        }
                     default:
                         print("not supported 8")
                     }
