@@ -216,9 +216,12 @@ class SNVectorEditor: UIViewController {
             nodeTapped = node
             node.becomeFirstResponder()
             let mc = UIMenuController.sharedMenuController()
-            var frame = CGRectApplyAffineTransform(node.frame, viewMain.transform)
-            frame.origin.y += viewMain.frame.origin.y
+            
+            var frame = node.frame
+            let offset = recognizer.locationInView(node)
+            frame.origin = recognizer.locationInView(self.view).translate(-offset.x, y: -offset.y)
             mc.setTargetRect(frame, inView: view)
+            
             var menuItems = [UIMenuItem]()
             if !closed && (node == nodes.first || node == nodes.last) {
                 menuItems.append(UIMenuItem(title: "Close", action: #selector(SNVectorEditor.closePath(_:))))
