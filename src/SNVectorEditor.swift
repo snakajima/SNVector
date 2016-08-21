@@ -47,7 +47,6 @@ class SNVectorEditor: UIViewController {
                 if let quad = elements[index] as? SNQuadCurve,
                    let next = elements[index+1] as? SNQuadCurve where
                     quad.pt.distance2(quad.cp.middle(next.cp)) > 1 {
-                    print("corner at", index)
                     return true
                 }
                 return false
@@ -91,15 +90,11 @@ class SNVectorEditor: UIViewController {
                 if closed && node == nodes.last, let first = nodes.first {
                     if first.corner {
                         elements.append(SNLine(pt: first.center))
-                    } else {
-                        //elements.append(SNQuadCurve(cp: node.center, pt: node.center.middle(first.center)))
                     }
                 }
             } else {
                 if let prev = prev {
                     elements.append(SNQuadCurve(cp: prev.center, pt: prev.center.middle(node.center)))
-                } else {
-                    // no need to add this case
                 }
                 prev = node
                 if closed && node == nodes.last, let first = nodes.first {
