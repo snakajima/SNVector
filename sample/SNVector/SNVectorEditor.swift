@@ -198,7 +198,7 @@ class SNVectorEditor: UIViewController {
                 menuItems.append(UIMenuItem(title: "Open", action: #selector(SNVectorEditor.openPath(_:))))
             }
             if closed || node != nodes.first && node != nodes.last {
-                menuItems.append(UIMenuItem(title: "Flip", action: #selector(SNVectorEditor.flipNode(_:))))
+                menuItems.append(UIMenuItem(title: "Toggle", action: #selector(SNVectorEditor.toggleNode(_:))))
             }
             menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(SNVectorEditor.duplicateNode(_:))))
             if elements.count > 1 {
@@ -210,7 +210,6 @@ class SNVectorEditor: UIViewController {
     }
 
     func deleteNode(menuController: UIMenuController) {
-        print("Delete Node")
         if let node = nodeTapped, let index = nodes.indexOf(node) {
             node.removeFromSuperview()
             nodes.removeAtIndex(index)
@@ -220,7 +219,6 @@ class SNVectorEditor: UIViewController {
     }
 
     func duplicateNode(menuController: UIMenuController) {
-        print("Duplicate Node")
         if let node = nodeTapped, let index = nodes.indexOf(node) {
             let nodeCopy = SNNodeView()
             nodeCopy.corner = node.corner
@@ -234,8 +232,7 @@ class SNVectorEditor: UIViewController {
         }
     }
     
-    func flipNode(menuController: UIMenuController) {
-        print("Flip Node")
+    func toggleNode(menuController: UIMenuController) {
         if let node = nodeTapped {
             node.corner = !node.corner
             updateElements()
@@ -244,14 +241,14 @@ class SNVectorEditor: UIViewController {
     }
 
     func closePath(menuController: UIMenuController) {
-        print("Close Path")
         closed = true
+        nodes.first!.corner = false
+        nodes.last!.corner = false
         updateElements()
         updateCurve()
     }
 
     func openPath(menuController: UIMenuController) {
-        print("Open Path")
         closed = false
         if let node = nodeTapped, let index = nodes.indexOf(node) {
             var nodesOpen = [SNNodeView]()
