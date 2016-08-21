@@ -130,7 +130,11 @@ class SNVectorEditor: UIViewController {
     }
     
     private func initializeNodes() {
-        closed = elements.last is SNCloseSubpath
+        var elements = self.elements // making a copy
+        if elements.last is SNCloseSubpath {
+            closed = true
+            elements.removeLast()
+        }
 
         nodes.removeAll()
         
@@ -143,7 +147,21 @@ class SNVectorEditor: UIViewController {
         for (index, element) in elements.enumerate() {
             switch(element) {
             case let move as SNMove:
-                addNodeViewAt(move.pt, corner:true)
+                if closed && index==0 {
+                    if let next = elements[1] as? SNQuadCurve {
+                        if let last = elements.last as? SNQuadCurve {
+                            if last.pt.distance2(last.cp.middle(next.cp)) > 1 {
+                                addNodeViewAt(move.pt, corner:true)
+                            }
+                        } else {
+                            addNodeViewAt(move.pt, corner:true)
+                        }
+                    } else {
+                        addNodeViewAt(move.pt, corner:true)
+                    }
+                } else {
+                    addNodeViewAt(move.pt, corner:true)
+                }
             case let line as SNLine:
                 addNodeViewAt(line.pt, corner:true)
             case let quad as SNQuadCurve:
@@ -154,8 +172,6 @@ class SNVectorEditor: UIViewController {
                     quad.pt.distance2(quad.cp.middle(next.cp)) > 1 {
                     addNodeViewAt(quad.pt, corner:true)
                 }
-            case _ as SNCloseSubpath:
-                break
             default:
                 print("unsupported 0")
             }
@@ -163,7 +179,7 @@ class SNVectorEditor: UIViewController {
     }
 
     func panNode(recognizer:UIPanGestureRecognizer) {
-        guard let subview = recognizer.view else {
+        guard let subview = recognizer.view as? SNNodeView else {
             return
         }
         let pt = recognizer.locationInView(viewMain)
@@ -175,6 +191,8 @@ class SNVectorEditor: UIViewController {
             let cp = pt.delta(offset)
             subview.center = cp
             updateElements()
+        case .Ended:
+            print("panNode ended", nodes.indexOf(subview))
         default:
             break
         }
