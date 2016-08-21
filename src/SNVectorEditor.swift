@@ -147,21 +147,12 @@ class SNVectorEditor: UIViewController {
         for (index, element) in elements.enumerate() {
             switch(element) {
             case let move as SNMove where index==0:
-                if closed {
-                    if let next = elements[1] as? SNQuadCurve {
-                        if let last = elements.last as? SNQuadCurve {
-                            if last.pt.distance2(last.cp.middle(next.cp)) > 1 {
-                                addNodeViewAt(move.pt, corner:true)
-                            }
-                        } else {
-                            addNodeViewAt(move.pt, corner:true)
-                        }
-                    } else {
-                        addNodeViewAt(move.pt, corner:true)
-                    }
-                } else {
-                    addNodeViewAt(move.pt, corner:true)
+                if closed, let next = elements[1] as? SNQuadCurve,
+                   let last = elements.last as? SNQuadCurve
+                         where last.pt.distance2(last.cp.middle(next.cp)) < 1 {
+                    break
                 }
+                addNodeViewAt(move.pt, corner:true)
             case _ as SNLine where closed && index + 1 == elements.count:
                 break
             case let line as SNLine:
