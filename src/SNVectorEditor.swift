@@ -241,15 +241,13 @@ class SNVectorEditor: UIViewController {
     }
 
     func openPath(menuController: UIMenuController) {
-        closed = false
         if let node = nodeTapped, let index = nodes.indexOf(node) {
-            var nodesOpen = [SNNodeView]()
-            for i in 0..<nodes.count {
-                nodesOpen.append(nodes[(i + index) % nodes.count])
+            closed = false
+            nodes = Array(0..<nodes.count).map {
+                nodes[($0 + index) % nodes.count]
             }
-            nodes = nodesOpen
+            updateElements()
         }
-        updateElements()
     }
 
     func pinch(recognizer:UIPinchGestureRecognizer) {
