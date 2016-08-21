@@ -14,7 +14,6 @@ class SNVectorEditor: UIViewController {
     let layerPoly = CAShapeLayer()
     
     var elements = [SNPathElement]()
-    var corners = [Bool]()
     var nodes = [SNNodeView]()
     var closed = false
 
@@ -38,22 +37,6 @@ class SNVectorEditor: UIViewController {
         layerPoly.strokeColor = UIColor(red: 0, green: 0.8, blue: 0, alpha: 1.0).CGColor
         layerPoly.lineCap = "round"
         layerPoly.lineJoin = "round"
-    }
-    
-    private func findCorners() {
-        corners.removeAll()
-        for index in 0..<elements.count-1 {
-            corners.append({
-                if let quad = elements[index] as? SNQuadCurve,
-                   let next = elements[index+1] as? SNQuadCurve where
-                    quad.pt.distance2(quad.cp.middle(next.cp)) > 1 {
-                    return true
-                }
-                return false
-            }())
-        }
-        corners.append(true)
-        assert(corners.count == elements.count)
     }
     
     private func updateElements() {
@@ -136,9 +119,26 @@ class SNVectorEditor: UIViewController {
         view.addGestureRecognizer(pan)
 
         updateCurveFromElements()
-        findCorners()
         viewMain.layer.addSublayer(layerPoly)
         viewMain.layer.addSublayer(layerCurve)
+        
+        initializeNodes()
+    }
+    
+    private func initializeNodes() {
+        var corners = [Bool]()
+        for index in 0..<elements.count-1 {
+            corners.append({
+                if let quad = elements[index] as? SNQuadCurve,
+                   let next = elements[index+1] as? SNQuadCurve where
+                    quad.pt.distance2(quad.cp.middle(next.cp)) > 1 {
+                    return true
+                }
+                return false
+            }())
+        }
+        corners.append(true)
+        assert(corners.count == elements.count)
         
         func addNodeViewAt(pt:CGPoint, corner:Bool) {
             let node = createNode(corner, pt: pt)
@@ -161,8 +161,6 @@ class SNVectorEditor: UIViewController {
                 print("unsupported 0")
             }
         }
-    
-
     }
 
     func panNode(recognizer:UIPanGestureRecognizer) {
@@ -285,5 +283,11 @@ class SNVectorEditor: UIViewController {
         default:
             viewMain.transform = transformLast
         }
+    }
+    
+    @IBAction func debug() {
+        nodes.forEach { $0.removeFromSuperview() }
+        nodes.removeAll()
+        initializeNodes()
     }
 }

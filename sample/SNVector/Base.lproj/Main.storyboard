@@ -75,7 +75,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="riq-Io-i0h">
+                            <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="riq-Io-i0h">
                                 <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
@@ -88,6 +88,14 @@
                             <constraint firstItem="riq-Io-i0h" firstAttribute="top" secondItem="H0A-0X-sij" secondAttribute="bottom" id="oiq-gg-K8t"/>
                         </constraints>
                     </view>
+                    <toolbarItems>
+                        <barButtonItem title="Debug" id="Z2l-zE-XFd">
+                            <connections>
+                                <action selector="debug" destination="jA3-AZ-z9e" id="gVD-eM-p3Q"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="viewMain" destination="riq-Io-i0h" id="iTH-Fc-rPB"/>
