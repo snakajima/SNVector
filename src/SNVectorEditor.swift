@@ -31,6 +31,7 @@ class SNVectorEditor: UIViewController {
         layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 1.0).CGColor
         layerCurve.lineCap = "round"
         layerCurve.lineJoin = "round"
+        
         layerPoly.path = SNPath.polyPathFrom(elements)
         layerPoly.lineWidth = 1
         layerPoly.fillColor = UIColor.clearColor().CGColor
@@ -114,9 +115,10 @@ class SNVectorEditor: UIViewController {
         updateCurveFromElements()
     }
     
-    func createNode(corner:Bool) -> SNNodeView {
+    func createNode(corner:Bool, pt:CGPoint) -> SNNodeView {
         let node = SNNodeView()
         node.corner = corner
+        node.center = pt
         
         let panNode = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.panNode))
         panNode.minimumNumberOfTouches = 1
@@ -144,9 +146,8 @@ class SNVectorEditor: UIViewController {
         viewMain.layer.addSublayer(layerCurve)
         
         func addNodeViewAt(pt:CGPoint, corner:Bool) {
-            let node = createNode(corner)
+            let node = createNode(corner, pt: pt)
             viewMain.addSubview(node)
-            node.center = pt
             nodes.append(node)
         }
         
@@ -223,9 +224,7 @@ class SNVectorEditor: UIViewController {
 
     func duplicateNode(menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.indexOf(node) {
-            let nodeCopy = createNode(node.corner)
-            let pt = node.center
-            nodeCopy.center = pt.translate(SNNodeView.radius * 2, y: 0)
+            let nodeCopy = createNode(node.corner, pt:node.center.translate(SNNodeView.radius * 2, y: 0))
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
             updateElements()
