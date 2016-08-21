@@ -192,12 +192,10 @@ class SNVectorEditor: UIViewController {
             frame.origin.y += viewMain.frame.origin.y
             mc.setTargetRect(frame, inView: view)
             var menuItems = [UIMenuItem]()
-            if node == nodes.first || node == nodes.last {
-                if closed {
-                    menuItems.append(UIMenuItem(title: "Open", action: #selector(SNVectorEditor.closePath(_:))))
-                } else {
-                    menuItems.append(UIMenuItem(title: "Close", action: #selector(SNVectorEditor.closePath(_:))))
-                }
+            if !closed && (node == nodes.first || node == nodes.last) {
+                menuItems.append(UIMenuItem(title: "Close", action: #selector(SNVectorEditor.closePath(_:))))
+            } else if closed {
+                menuItems.append(UIMenuItem(title: "Open", action: #selector(SNVectorEditor.openPath(_:))))
             }
             if closed || node != nodes.first && node != nodes.last {
                 menuItems.append(UIMenuItem(title: "Flip", action: #selector(SNVectorEditor.flipNode(_:))))
@@ -247,7 +245,21 @@ class SNVectorEditor: UIViewController {
 
     func closePath(menuController: UIMenuController) {
         print("Close Path")
-        closed = !closed
+        closed = true
+        updateElements()
+        updateCurve()
+    }
+
+    func openPath(menuController: UIMenuController) {
+        print("Open Path")
+        closed = false
+        if let node = nodeTapped, let index = nodes.indexOf(node) {
+            var nodesOpen = [SNNodeView]()
+            for i in 0..<nodes.count {
+                nodesOpen.append(nodes[(i + index) % nodes.count])
+            }
+            nodes = nodesOpen
+        }
         updateElements()
         updateCurve()
     }
