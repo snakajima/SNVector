@@ -70,7 +70,11 @@ class SNVectorEditor: UIViewController {
         for (i, node) in nodes.enumerate() {
             if i==0 {
                 if closed && !node.corner {
-                    elements.append(SNMove(pt: node.center))
+                    if let prev = prev where !prev.corner {
+                        elements.append(SNMove(pt: prev.center.middle(node.center)))
+                    } else {
+                        elements.append(SNMove(pt: node.center))
+                    }
                     prev = node
                 } else {
                     elements.append(SNMove(pt: node.center))
