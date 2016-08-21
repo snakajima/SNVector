@@ -251,6 +251,7 @@ class SNVectorEditor: UIViewController {
     func duplicateNode(menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.indexOf(node) {
             let nodeCopy = createNode(node.corner, pt:node.center.translate(SNNodeView.radius * 2, y: 0))
+            nodeCopy.transform = node.transform
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
             updateElements()
