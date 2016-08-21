@@ -311,7 +311,8 @@ class SNVectorEditor: UIViewController {
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
             let delta = pt.delta(locationLast)
-            viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+            let a = viewMain.transform.a
+            viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x / a, delta.y / a)
         case .Ended:
             break
         default:
