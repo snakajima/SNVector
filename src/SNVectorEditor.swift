@@ -108,7 +108,12 @@ class SNVectorEditor: UIViewController {
         node.addGestureRecognizer(panNode)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(SNVectorEditor.tapNode))
+        tap.numberOfTapsRequired = 1
         node.addGestureRecognizer(tap)
+
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(SNVectorEditor.doubleTapNode))
+        doubleTap.numberOfTapsRequired = 2
+        node.addGestureRecognizer(doubleTap)
         return node
     }
 
@@ -190,6 +195,19 @@ class SNVectorEditor: UIViewController {
             print("panNode ended", nodes.indexOf(subview))
         default:
             break
+        }
+    }
+
+    func doubleTapNode(recognizer:UITapGestureRecognizer) {
+        if let node = recognizer.view as? SNNodeView {
+            node.corner = !node.corner
+            updateElements()
+            UIView.animateWithDuration(0.2, animations: {
+                //
+            }, completion: { (_) in
+                let mc = UIMenuController.sharedMenuController()
+                mc.menuVisible = false
+            })
         }
     }
     
