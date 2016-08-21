@@ -15,6 +15,7 @@ class SNVectorEditor: UIViewController {
     var elements = [SNPathElement]()
     var corners = [Bool]()
     var nodes = [SNNodeView]()
+    var closed = false
 
     // Transient
     var offset = CGPoint.zero // for panNode
@@ -55,14 +56,21 @@ class SNVectorEditor: UIViewController {
     }
     
     private func updateElements() {
-        nodes.first!.corner = true
-        nodes.last!.corner = true
+        var prev:SNNodeView?
+        if closed {
+            if !nodes.last!.corner {
+                prev = nodes.last
+            }
+        } else {
+            nodes.first!.corner = true
+            nodes.last!.corner = true
+        }
 
         elements.removeAll()
-        var prev:SNNodeView?
         for (i, node) in nodes.enumerate() {
             if i==0 {
                 elements.append(SNMove(pt: node.center))
+                prev = nil
             } else if node.corner {
                 if let prev = prev {
                     elements.append(SNQuadCurve(cp: prev.center, pt: node.center))
@@ -70,6 +78,13 @@ class SNVectorEditor: UIViewController {
                     elements.append(SNLine(pt: node.center))
                 }
                 prev = nil
+                if closed && node == nodes.last, let first = nodes.first {
+                    if first.corner {
+                        elements.append(SNLine(pt: first.center))
+                    } else {
+                        //elements.append(SNQuadCurve(cp: node.center, pt: node.center.middle(first.center)))
+                    }
+                }
             } else {
                 if let prev = prev {
                     elements.append(SNQuadCurve(cp: prev.center, pt: prev.center.middle(node.center)))
@@ -77,6 +92,13 @@ class SNVectorEditor: UIViewController {
                     // no need to add this case
                 }
                 prev = node
+                if closed && node == nodes.last, let first = nodes.first {
+                    if first.corner {
+                        elements.append(SNQuadCurve(cp: node.center, pt: first.center))
+                    } else {
+                        elements.append(SNQuadCurve(cp: node.center, pt: node.center.middle(first.center)))
+                    }
+                }
             }
         }
     }
@@ -162,7 +184,14 @@ class SNVectorEditor: UIViewController {
             frame.origin.y += viewMain.frame.origin.y
             mc.setTargetRect(frame, inView: view)
             var menuItems = [UIMenuItem]()
-            if node != nodes.first && node != nodes.last {
+            if node == nodes.first || node == nodes.last {
+                if closed {
+                    menuItems.append(UIMenuItem(title: "Open", action: #selector(SNVectorEditor.closePath(_:))))
+                } else {
+                    menuItems.append(UIMenuItem(title: "Close", action: #selector(SNVectorEditor.closePath(_:))))
+                }
+            }
+            if closed || node != nodes.first && node != nodes.last {
                 menuItems.append(UIMenuItem(title: "Flip", action: #selector(SNVectorEditor.flipNode(_:))))
             }
             menuItems.append(UIMenuItem(title: "Duplicate", action: #selector(SNVectorEditor.duplicateNode(_:))))
@@ -206,6 +235,13 @@ class SNVectorEditor: UIViewController {
             updateElements()
             updateCurve()
         }
+    }
+
+    func closePath(menuController: UIMenuController) {
+        print("Close Path")
+        closed = !closed
+        updateElements()
+        updateCurve()
     }
 
     func pinch(recognizer:UIPinchGestureRecognizer) {
