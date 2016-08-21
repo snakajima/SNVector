@@ -23,7 +23,7 @@ class SNVectorEditor: UIViewController {
     var transformLast = CGAffineTransformIdentity // for pinch & pan
     var locationLast = CGPoint.zero // pan
 
-    private func updateCurve() {
+    private func updateCurveFromElements() {
         layerCurve.path = SNPath.pathFrom(elements)
         layerCurve.lineWidth = 3
         layerCurve.fillColor = UIColor.clearColor().CGColor
@@ -109,6 +109,8 @@ class SNVectorEditor: UIViewController {
                 }
             }
         }
+        
+        updateCurveFromElements()
     }
     
     func prepareNode(node:SNNodeView) {
@@ -131,7 +133,7 @@ class SNVectorEditor: UIViewController {
         pan.maximumNumberOfTouches = 2
         view.addGestureRecognizer(pan)
 
-        updateCurve()
+        updateCurveFromElements()
         findCorners()
         viewMain.layer.addSublayer(layerPoly)
         viewMain.layer.addSublayer(layerCurve)
@@ -177,7 +179,6 @@ class SNVectorEditor: UIViewController {
             let cp = pt.delta(offset)
             subview.center = cp
             updateElements()
-            updateCurve()
         default:
             break
         }
@@ -214,7 +215,6 @@ class SNVectorEditor: UIViewController {
             node.removeFromSuperview()
             nodes.removeAtIndex(index)
             updateElements()
-            updateCurve()
         }
     }
 
@@ -228,7 +228,6 @@ class SNVectorEditor: UIViewController {
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
             updateElements()
-            updateCurve()
         }
     }
     
@@ -236,7 +235,6 @@ class SNVectorEditor: UIViewController {
         if let node = nodeTapped {
             node.corner = !node.corner
             updateElements()
-            updateCurve()
         }
     }
 
@@ -245,7 +243,6 @@ class SNVectorEditor: UIViewController {
         nodes.first!.corner = false
         nodes.last!.corner = false
         updateElements()
-        updateCurve()
     }
 
     func openPath(menuController: UIMenuController) {
@@ -258,7 +255,6 @@ class SNVectorEditor: UIViewController {
             nodes = nodesOpen
         }
         updateElements()
-        updateCurve()
     }
 
     func pinch(recognizer:UIPinchGestureRecognizer) {
