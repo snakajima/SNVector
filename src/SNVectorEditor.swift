@@ -303,13 +303,13 @@ class SNVectorEditor: UIViewController {
             return
         }
         let pt = recognizer.locationInView(view)
-        let delta = pt.delta(locationLast)
         switch(recognizer.state) {
         case .Began:
             transformLast = viewMain.transform
             locationLast = pt
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
+            let delta = pt.delta(locationLast)
             viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
         case .Ended:
             break
