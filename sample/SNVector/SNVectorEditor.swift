@@ -69,8 +69,13 @@ class SNVectorEditor: UIViewController {
         elements.removeAll()
         for (i, node) in nodes.enumerate() {
             if i==0 {
-                elements.append(SNMove(pt: node.center))
-                prev = nil
+                if closed && !node.corner {
+                    elements.append(SNMove(pt: node.center))
+                    prev = node
+                } else {
+                    elements.append(SNMove(pt: node.center))
+                    prev = nil
+                }
             } else if node.corner {
                 if let prev = prev {
                     elements.append(SNQuadCurve(cp: prev.center, pt: node.center))
