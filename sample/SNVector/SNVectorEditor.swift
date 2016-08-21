@@ -56,11 +56,10 @@ class SNVectorEditor: UIViewController {
     }
     
     private func updateElements() {
+        var last:SNNodeView?
         var prev:SNNodeView?
         if closed {
-            if !nodes.last!.corner {
-                prev = nodes.last
-            }
+            last = nodes.last
         } else {
             nodes.first!.corner = true
             nodes.last!.corner = true
@@ -69,11 +68,11 @@ class SNVectorEditor: UIViewController {
         elements.removeAll()
         for (i, node) in nodes.enumerate() {
             if i==0 {
-                if closed && !node.corner {
-                    if let prev = prev where !prev.corner {
-                        elements.append(SNMove(pt: prev.center.middle(node.center)))
+                if let last = last where !node.corner {
+                    if !last.corner {
+                        elements.append(SNMove(pt: last.center.middle(node.center)))
                     } else {
-                        elements.append(SNMove(pt: node.center))
+                        elements.append(SNMove(pt: last.center))
                     }
                     prev = node
                 } else {
