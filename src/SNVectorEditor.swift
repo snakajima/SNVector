@@ -12,12 +12,13 @@ class SNVectorEditor: UIViewController {
     @IBOutlet var viewMain:UIView!
     let layerCurve = CAShapeLayer()
     let layerPoly = CAShapeLayer()
+    
     var elements = [SNPathElement]()
     var corners = [Bool]()
     var nodes = [SNNodeView]()
     var closed = false
 
-    // Transient
+    // Transient properties
     var offset = CGPoint.zero // for panNode
     var nodeTapped:SNNodeView? // for panTapped
     var transformLast = CGAffineTransformIdentity // for pinch & pan
@@ -113,7 +114,10 @@ class SNVectorEditor: UIViewController {
         updateCurveFromElements()
     }
     
-    func prepareNode(node:SNNodeView) {
+    func createNode(corner:Bool) -> SNNodeView {
+        let node = SNNodeView()
+        node.corner = corner
+        
         let panNode = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.panNode))
         panNode.minimumNumberOfTouches = 1
         panNode.maximumNumberOfTouches = 1
@@ -121,6 +125,7 @@ class SNVectorEditor: UIViewController {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(SNVectorEditor.tapNode))
         node.addGestureRecognizer(tap)
+        return node
     }
 
     override func viewDidLoad() {
@@ -139,12 +144,10 @@ class SNVectorEditor: UIViewController {
         viewMain.layer.addSublayer(layerCurve)
         
         func addNodeViewAt(pt:CGPoint, corner:Bool) {
-            let node = SNNodeView()
-            node.corner = corner
+            let node = createNode(corner)
             viewMain.addSubview(node)
             node.center = pt
             nodes.append(node)
-            prepareNode(node)
         }
         
         for (index, element) in elements.enumerate() {
@@ -220,11 +223,9 @@ class SNVectorEditor: UIViewController {
 
     func duplicateNode(menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.indexOf(node) {
-            let nodeCopy = SNNodeView()
-            nodeCopy.corner = node.corner
+            let nodeCopy = createNode(node.corner)
             let pt = node.center
-            nodeCopy.center = CGPoint(x: pt.x + SNNodeView.radius * 2, y: pt.y)
-            prepareNode(nodeCopy)
+            nodeCopy.center = pt.translate(SNNodeView.radius * 2, y: 0)
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
             updateElements()
