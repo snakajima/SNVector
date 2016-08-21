@@ -163,6 +163,9 @@ class SNVectorEditor: UIViewController {
                     addNodeViewAt(move.pt, corner:true)
                 }
             case let line as SNLine:
+                if closed && index + 1 == elements.count {
+                    break
+                }
                 addNodeViewAt(line.pt, corner:true)
             case let quad as SNQuadCurve:
                 addNodeViewAt(quad.cp, corner:false)
