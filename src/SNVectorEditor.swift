@@ -217,7 +217,7 @@ class SNVectorEditor: UIViewController {
             node.becomeFirstResponder()
             let mc = UIMenuController.sharedMenuController()
             
-            var frame = node.frame
+            var frame = node.bounds
             let offset = recognizer.locationInView(node)
             frame.origin = recognizer.locationInView(self.view).translate(-offset.x, y: -offset.y)
             mc.setTargetRect(frame, inView: view)
