@@ -90,6 +90,10 @@ class SNVectorEditor: UIViewController {
             }
         }
         
+        if closed {
+            elements.append(SNCloseSubpath())
+        }
+        
         updateCurveFromElements()
     }
     
@@ -126,19 +130,9 @@ class SNVectorEditor: UIViewController {
     }
     
     private func initializeNodes() {
-        var corners = [Bool]()
-        for index in 0..<elements.count-1 {
-            corners.append({
-                if let quad = elements[index] as? SNQuadCurve,
-                   let next = elements[index+1] as? SNQuadCurve where
-                    quad.pt.distance2(quad.cp.middle(next.cp)) > 1 {
-                    return true
-                }
-                return false
-            }())
-        }
-        corners.append(true)
-        assert(corners.count == elements.count)
+        closed = elements.last is SNCloseSubpath
+
+        nodes.removeAll()
         
         func addNodeViewAt(pt:CGPoint, corner:Bool) {
             let node = createNode(corner, pt: pt)
@@ -154,9 +148,14 @@ class SNVectorEditor: UIViewController {
                 addNodeViewAt(line.pt, corner:true)
             case let quad as SNQuadCurve:
                 addNodeViewAt(quad.cp, corner:false)
-                if corners[index] {
+                if !closed && index == elements.count-1 {
+                    addNodeViewAt(quad.pt, corner:true)
+                } else if let next = elements[(index + 1) % elements.count] as? SNQuadCurve where
+                    quad.pt.distance2(quad.cp.middle(next.cp)) > 1 {
                     addNodeViewAt(quad.pt, corner:true)
                 }
+            case _ as SNCloseSubpath:
+                break
             default:
                 print("unsupported 0")
             }
@@ -287,7 +286,6 @@ class SNVectorEditor: UIViewController {
     
     @IBAction func debug() {
         nodes.forEach { $0.removeFromSuperview() }
-        nodes.removeAll()
         initializeNodes()
     }
 }
