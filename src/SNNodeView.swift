@@ -19,7 +19,9 @@ class SNNodeView: UIView {
             }
         }
     }
+    // Transient properties
     var offset = CGPoint.zero // for panNode
+    var lastCenter = CGPoint.zero
     
     init() {
         super.init(frame: CGRect(x: 0, y: 0, width: SNNodeView.radius * 2, height: SNNodeView.radius * 2))

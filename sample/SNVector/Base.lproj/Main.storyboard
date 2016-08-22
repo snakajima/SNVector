@@ -90,6 +90,17 @@
                                             <action selector="debug" destination="jA3-AZ-z9e" id="Ai6-HB-BnR"/>
                                         </connections>
                                     </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="k9C-fV-0N7"/>
+                                    <barButtonItem title="Undo" id="kdu-jg-ArV">
+                                        <connections>
+                                            <action selector="undo" destination="jA3-AZ-z9e" id="ksn-Ds-lDu"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem title="Redo" id="Qjn-tJ-bEo">
+                                        <connections>
+                                            <action selector="redo" destination="jA3-AZ-z9e" id="e6e-2Z-cIH"/>
+                                        </connections>
+                                    </barButtonItem>
                                 </items>
                             </toolbar>
                         </subviews>
@@ -108,6 +119,8 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                     <connections>
+                        <outlet property="btnRedo" destination="Qjn-tJ-bEo" id="n2M-ZO-jbC"/>
+                        <outlet property="btnUndo" destination="kdu-jg-ArV" id="giL-D5-Ys4"/>
                         <outlet property="viewMain" destination="riq-Io-i0h" id="iTH-Fc-rPB"/>
                     </connections>
                 </viewController>

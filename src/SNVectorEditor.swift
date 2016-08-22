@@ -27,17 +27,22 @@ struct MoveNode: Undoable {
 
 class SNVectorEditor: UIViewController {
     @IBOutlet var viewMain:UIView!
-    let layerCurve = CAShapeLayer()
-    let layerPoly = CAShapeLayer()
+    @IBOutlet var btnUndo:UIBarButtonItem!
+    @IBOutlet var btnRedo:UIBarButtonItem!
+    
+    private let layerCurve = CAShapeLayer()
+    private let layerPoly = CAShapeLayer()
     
     var elements = [SNPathElement]()
-    var nodes = [SNNodeView]()
-    var closed = false
+    private var nodes = [SNNodeView]()
+    private var closed = false
+    private var undoStack = [Undoable]()
+    private var undoCursor = 0
 
     // Transient properties
-    var nodeTapped:SNNodeView? // for panTapped
-    var transformLast = CGAffineTransformIdentity // for pinch & pan
-    var locationLast = CGPoint.zero // pan
+    private var nodeTapped:SNNodeView? // for panTapped
+    private var transformLast = CGAffineTransformIdentity // for pinch & pan
+    private var locationLast = CGPoint.zero // pan
 
     private func updateCurveFromElements() {
         layerCurve.path = SNPath.pathFrom(elements)
@@ -148,6 +153,7 @@ class SNVectorEditor: UIViewController {
         viewMain.layer.addSublayer(layerCurve)
         
         initializeNodes()
+        updateUI()
     }
     
     private func initializeNodes() {
@@ -201,6 +207,7 @@ class SNVectorEditor: UIViewController {
         let pt = recognizer.locationInView(viewMain)
         switch(recognizer.state) {
         case .Began:
+            node.lastCenter = node.center
             node.offset = pt.delta(node.center)
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
@@ -208,7 +215,8 @@ class SNVectorEditor: UIViewController {
             node.center = cp
             updateElements()
         case .Ended:
-            print("panNode ended", nodes.indexOf(node))
+            let index = nodes.indexOf(node)!
+            appendUndoable(MoveNode(index: index, ptOld: node.lastCenter, ptNew: node.center))
         default:
             break
         }
@@ -341,3 +349,45 @@ class SNVectorEditor: UIViewController {
         initializeNodes()
     }
 }
+
+// MARK: Undo & Redo
+extension SNVectorEditor {
+    private func updateUI() {
+        btnUndo.enabled = undoCursor > 0
+        btnRedo.enabled = undoCursor < undoStack.count
+    }
+    
+    private func appendUndoable(item:Undoable) {
+        if undoCursor < undoStack.count {
+            undoStack.removeLast(undoStack.count - undoCursor)
+        }
+        undoStack.append(item)
+        undoCursor += 1
+        assert(undoCursor == undoStack.count)
+        
+        updateUI()
+    }
+
+    @IBAction func undo() {
+        print("undo")
+        assert(undoCursor > 0)
+        undoCursor -= 1
+        let item = undoStack[undoCursor]
+        item.undo(&nodes)
+
+        updateElements()
+        updateUI()
+    }
+    
+    @IBAction func redo() {
+        print("redo")
+        assert(undoCursor < undoStack.count)
+        let item = undoStack[undoCursor]
+        undoCursor += 1
+        item.redo(&nodes)
+
+        updateElements()
+        updateUI()
+    }
+}
+
