@@ -63,10 +63,10 @@
             </objects>
             <point key="canvasLocation" x="-241" y="394"/>
         </scene>
-        <!--Vector Editor-->
+        <!--Vector View Controller-->
         <scene sceneID="ZEx-cv-kaN">
             <objects>
-                <viewController id="jA3-AZ-z9e" customClass="SNVectorEditor" customModule="SNVector" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="jA3-AZ-z9e" customClass="VectorViewController" customModule="SNVector" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="H0A-0X-sij"/>
                         <viewControllerLayoutGuide type="bottom" id="Urj-pD-jQd"/>

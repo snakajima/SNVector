@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		746970F11D69690900A8B6B1 /* SNNodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746970EF1D69690900A8B6B1 /* SNNodeView.swift */; };
 		746970F21D69690900A8B6B1 /* SNVectorEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746970F01D69690900A8B6B1 /* SNVectorEditor.swift */; };
+		746970F41D6B0F0700A8B6B1 /* VectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746970F31D6B0F0700A8B6B1 /* VectorViewController.swift */; };
+		746970F61D6B121300A8B6B1 /* SNVectorEditor.xib in Resources */ = {isa = PBXBuildFile; fileRef = 746970F51D6B121300A8B6B1 /* SNVectorEditor.xib */; };
 		74F4137F1D63DA04006F765E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4137E1D63DA04006F765E /* AppDelegate.swift */; };
 		74F413811D63DA04006F765E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F413801D63DA04006F765E /* ViewController.swift */; };
 		74F413841D63DA04006F765E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74F413821D63DA04006F765E /* Main.storyboard */; };
@@ -22,6 +24,8 @@
 /* Begin PBXFileReference section */
 		746970EF1D69690900A8B6B1 /* SNNodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNNodeView.swift; sourceTree = "<group>"; };
 		746970F01D69690900A8B6B1 /* SNVectorEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNVectorEditor.swift; sourceTree = "<group>"; };
+		746970F31D6B0F0700A8B6B1 /* VectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorViewController.swift; sourceTree = "<group>"; };
+		746970F51D6B121300A8B6B1 /* SNVectorEditor.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNVectorEditor.xib; sourceTree = "<group>"; };
 		74F4137B1D63DA04006F765E /* SNVector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNVector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74F4137E1D63DA04006F765E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74F413801D63DA04006F765E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -70,6 +74,7 @@
 				74F4139A1D640D93006F765E /* README.md */,
 				74F4137E1D63DA04006F765E /* AppDelegate.swift */,
 				74F413801D63DA04006F765E /* ViewController.swift */,
+				746970F31D6B0F0700A8B6B1 /* VectorViewController.swift */,
 				74F413821D63DA04006F765E /* Main.storyboard */,
 				74F413851D63DA04006F765E /* Assets.xcassets */,
 				74F413871D63DA04006F765E /* LaunchScreen.storyboard */,
@@ -94,6 +99,7 @@
 			children = (
 				746970EF1D69690900A8B6B1 /* SNNodeView.swift */,
 				746970F01D69690900A8B6B1 /* SNVectorEditor.swift */,
+				746970F51D6B121300A8B6B1 /* SNVectorEditor.xib */,
 			);
 			name = src;
 			path = ../src;
@@ -159,6 +165,7 @@
 			files = (
 				74F413891D63DA04006F765E /* LaunchScreen.storyboard in Resources */,
 				74F413861D63DA04006F765E /* Assets.xcassets in Resources */,
+				746970F61D6B121300A8B6B1 /* SNVectorEditor.xib in Resources */,
 				74F413841D63DA04006F765E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -177,6 +184,7 @@
 				74F413941D63DAF3006F765E /* SNDrawView.swift in Sources */,
 				746970F21D69690900A8B6B1 /* SNVectorEditor.swift in Sources */,
 				74F4137F1D63DA04006F765E /* AppDelegate.swift in Sources */,
+				746970F41D6B0F0700A8B6B1 /* VectorViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

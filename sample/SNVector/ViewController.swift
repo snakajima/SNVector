@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let editor = segue.destinationViewController as? SNVectorEditor {
+        if let editor = segue.destinationViewController as? VectorViewController {
             editor.elements = drawView.builder.elements
         }
     }

@@ -117,8 +117,8 @@ private struct DeleteNode: Undoable {
 
 class SNVectorEditor: UIViewController {
     @IBOutlet var viewMain:UIView!
-    @IBOutlet var btnUndo:UIBarButtonItem!
-    @IBOutlet var btnRedo:UIBarButtonItem!
+    @IBOutlet var btnUndo:UIBarButtonItem?
+    @IBOutlet var btnRedo:UIBarButtonItem?
     
     private let layerCurve = CAShapeLayer()
     private let layerPoly = CAShapeLayer()
@@ -235,12 +235,15 @@ class SNVectorEditor: UIViewController {
         super.viewDidLoad()
 
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(SNVectorEditor.pinch))
-        view.addGestureRecognizer(pinch)
+        self.view.addGestureRecognizer(pinch)
         let pan = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.pan))
         pan.minimumNumberOfTouches = 2
         pan.maximumNumberOfTouches = 2
-        view.addGestureRecognizer(pan)
-
+        self.view.addGestureRecognizer(pan)
+    }
+    
+    func extraInit(elements:[SNPathElement]) {
+        self.elements = elements
         updateCurveFromElements()
         viewMain.layer.addSublayer(layerPoly)
         viewMain.layer.addSublayer(layerCurve)
@@ -339,7 +342,7 @@ class SNVectorEditor: UIViewController {
             var frame = node.bounds
             let offset = recognizer.locationInView(node)
             frame.origin = recognizer.locationInView(self.view).translate(-offset.x, y: -offset.y)
-            mc.setTargetRect(frame, inView: view)
+            mc.setTargetRect(frame, inView: self.view)
             
             var menuItems = [UIMenuItem]()
             if !closed && (node == nodes.first || node == nodes.last) {
@@ -455,8 +458,8 @@ class SNVectorEditor: UIViewController {
 // MARK: Undo & Redo
 extension SNVectorEditor {
     private func updateUI() {
-        btnUndo.enabled = undoCursor > 0
-        btnRedo.enabled = undoCursor < undoStack.count
+        btnUndo?.enabled = undoCursor > 0
+        btnRedo?.enabled = undoCursor < undoStack.count
     }
     
     private func appendUndoable(item:Undoable) {
