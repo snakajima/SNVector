@@ -192,7 +192,10 @@ class SNVectorEditor: UIViewController {
             }
         }
     }
+}
 
+// MARK: Moving Nodes around
+extension SNVectorEditor {
     func panNode(recognizer:UIPanGestureRecognizer) {
         guard let node = recognizer.view as? SNNodeView else {
             return
@@ -214,7 +217,18 @@ class SNVectorEditor: UIViewController {
             break
         }
     }
+}
 
+// MARK: Debug
+extension SNVectorEditor {
+    func debug() {
+        nodes.forEach { $0.removeFromSuperview() }
+        initializeNodes()
+    }
+}
+
+// MARK: Popup menu
+extension SNVectorEditor {
     func doubleTapNode(recognizer:UITapGestureRecognizer) {
         if let node = recognizer.view as? SNNodeView, let index = nodes.indexOf(node) {
             node.corner = !node.corner
@@ -307,7 +321,10 @@ class SNVectorEditor: UIViewController {
             updateElements()
         }
     }
+}
 
+// MARK: Pinch & Zoom, Panning of main view
+extension SNVectorEditor {
     func pinch(recognizer:UIPinchGestureRecognizer) {
         switch(recognizer.state) {
         case .Began:
@@ -345,11 +362,6 @@ class SNVectorEditor: UIViewController {
             viewMain.transform = transformLast
         }
     }
-    
-    func debug() {
-        nodes.forEach { $0.removeFromSuperview() }
-        initializeNodes()
-    }
 }
 
 // MARK: Undo & Redo
@@ -377,32 +389,135 @@ extension SNVectorEditor {
     }
 
     func undo() {
-        print("undo")
-        assert(undoCursor > 0)
-        undoCursor -= 1
-        let item = undoStack[undoCursor]
-        if let node = item.undo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
-            prepareNode(node)
-            viewMain.insertSubview(node, atIndex: index)
-        }
+        if undoable {
+            undoCursor -= 1
+            let item = undoStack[undoCursor]
+            if let node = item.undo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
+                prepareNode(node)
+                viewMain.insertSubview(node, atIndex: index)
+            }
 
-        updateElements()
-        updateUI()
+            updateElements()
+            updateUI()
+        }
     }
     
     func redo() {
-        print("redo")
-        assert(undoCursor < undoStack.count)
-        let item = undoStack[undoCursor]
-        undoCursor += 1
-        if let node = item.redo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
-            prepareNode(node)
-            viewMain.insertSubview(node, atIndex: index)
-        }
+        if redoable {
+            let item = undoStack[undoCursor]
+            undoCursor += 1
+            if let node = item.redo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
+                prepareNode(node)
+                viewMain.insertSubview(node, atIndex: index)
+            }
 
-        updateElements()
-        updateUI()
+            updateElements()
+            updateUI()
+        }
     }
+
+    private struct MoveNode: Undoable {
+        let index:Int
+        let ptOld:CGPoint
+        let ptNew:CGPoint
+        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            nodes[index].center = ptNew
+            return nil
+        }
+        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            nodes[index].center = ptOld
+            return nil
+        }
+    }
+
+    private struct ToggleNode: Undoable {
+        let index:Int
+        let corner:Bool
+        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            nodes[index].corner = corner
+            return nil
+        }
+        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            nodes[index].corner = !corner
+            return nil
+        }
+    }
+
+    private struct InsertNode: Undoable {
+        let index:Int
+        let pt:CGPoint
+        let corner:Bool
+        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            let node = SNNodeView()
+            node.corner = corner
+            node.center = pt
+            nodes.insert(node, atIndex: index)
+            return node
+        }
+        
+        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            nodes[index].removeFromSuperview()
+            nodes.removeAtIndex(index)
+            return nil
+        }
+    }
+
+    private struct ClosePath: Undoable {
+        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            closed = true
+            nodes.first!.corner = false
+            nodes.last!.corner = false
+            return nil
+        }
+        
+        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            closed = false
+            return nil
+        }
+    }
+
+    private struct OpenPath: Undoable {
+        let index:Int
+        let cornerFirst:Bool
+        let cornerLast:Bool
+        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            closed = false
+            nodes = Array(0..<nodes.count).map {
+                nodes[($0 + index) % nodes.count]
+            }
+            return nil
+        }
+        
+        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            closed = true
+            nodes.first!.corner = cornerFirst
+            nodes.last!.corner = cornerLast
+            nodes = Array(0..<nodes.count).map {
+                nodes[($0 + nodes.count - index) % nodes.count]
+            }
+            return nil
+        }
+    }
+
+    private struct DeleteNode: Undoable {
+        let index:Int
+        let pt:CGPoint
+        let corner:Bool
+        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            nodes[index].removeFromSuperview()
+            nodes.removeAtIndex(index)
+            return nil
+        }
+        
+        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+            let node = SNNodeView()
+            node.corner = corner
+            node.center = pt
+            nodes.insert(node, atIndex: index)
+            return node
+        }
+    }
+
 }
 
 private protocol Undoable {
@@ -410,105 +525,4 @@ private protocol Undoable {
     func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView?
 }
 
-private struct MoveNode: Undoable {
-    let index:Int
-    let ptOld:CGPoint
-    let ptNew:CGPoint
-    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        nodes[index].center = ptNew
-        return nil
-    }
-    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        nodes[index].center = ptOld
-        return nil
-    }
-}
-
-private struct ToggleNode: Undoable {
-    let index:Int
-    let corner:Bool
-    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        nodes[index].corner = corner
-        return nil
-    }
-    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        nodes[index].corner = !corner
-        return nil
-    }
-}
-
-private struct InsertNode: Undoable {
-    let index:Int
-    let pt:CGPoint
-    let corner:Bool
-    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        let node = SNNodeView()
-        node.corner = corner
-        node.center = pt
-        nodes.insert(node, atIndex: index)
-        return node
-    }
     
-    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        nodes[index].removeFromSuperview()
-        nodes.removeAtIndex(index)
-        return nil
-    }
-}
-
-private struct ClosePath: Undoable {
-    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        closed = true
-        nodes.first!.corner = false
-        nodes.last!.corner = false
-        return nil
-    }
-    
-    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        closed = false
-        return nil
-    }
-}
-
-private struct OpenPath: Undoable {
-    let index:Int
-    let cornerFirst:Bool
-    let cornerLast:Bool
-    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        closed = false
-        nodes = Array(0..<nodes.count).map {
-            nodes[($0 + index) % nodes.count]
-        }
-        return nil
-    }
-    
-    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        closed = true
-        nodes.first!.corner = cornerFirst
-        nodes.last!.corner = cornerLast
-        nodes = Array(0..<nodes.count).map {
-            nodes[($0 + nodes.count - index) % nodes.count]
-        }
-        return nil
-    }
-}
-
-private struct DeleteNode: Undoable {
-    let index:Int
-    let pt:CGPoint
-    let corner:Bool
-    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        nodes[index].removeFromSuperview()
-        nodes.removeAtIndex(index)
-        return nil
-    }
-    
-    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
-        let node = SNNodeView()
-        node.corner = corner
-        node.center = pt
-        nodes.insert(node, atIndex: index)
-        return node
-    }
-}
-

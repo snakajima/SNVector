@@ -24,12 +24,10 @@ class VectorViewController: UIViewController {
     }
 
     @IBAction func undo() {
-        print("undo")
         editor.undo()
     }
     
     @IBAction func redo() {
-        print("redo")
         editor.redo()
     }
 
