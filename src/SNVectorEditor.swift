@@ -338,6 +338,8 @@ class SNVectorEditor: UIViewController {
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
             updateElements()
+            
+            appendUndoable(InsertNode(index: index + 1, pt: nodeCopy.center, corner: nodeCopy.corner))
         }
     }
     
