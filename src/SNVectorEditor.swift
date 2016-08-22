@@ -342,7 +342,7 @@ extension SNVectorEditor {
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
             viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
-            var xf = nodeTransform
+            let xf = nodeTransform
             nodes.forEach { $0.transform = xf }
         case .Ended:
             break
