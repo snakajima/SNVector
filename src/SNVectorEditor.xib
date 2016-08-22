@@ -17,19 +17,33 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LFm-Wd-zva">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                    <rect key="frame" x="-864" y="-784" width="2048" height="2048"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="2048" id="bBB-on-jc6"/>
+                        <constraint firstAttribute="width" constant="2048" id="iEV-sN-MMg"/>
+                    </constraints>
                 </view>
             </subviews>
             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="LFm-Wd-zva" secondAttribute="trailing" id="5J6-Fh-gVz"/>
+                <constraint firstItem="LFm-Wd-zva" firstAttribute="centerX" secondItem="tnI-Np-Acn" secondAttribute="centerX" id="80b-SJ-feE"/>
                 <constraint firstAttribute="bottom" secondItem="LFm-Wd-zva" secondAttribute="bottom" id="C1k-E0-ntY"/>
+                <constraint firstItem="LFm-Wd-zva" firstAttribute="centerY" secondItem="tnI-Np-Acn" secondAttribute="centerY" id="MFk-Ls-Lvj"/>
                 <constraint firstItem="LFm-Wd-zva" firstAttribute="top" secondItem="tnI-Np-Acn" secondAttribute="top" id="NEv-hY-2aA"/>
                 <constraint firstItem="LFm-Wd-zva" firstAttribute="leading" secondItem="tnI-Np-Acn" secondAttribute="leading" id="gLC-Ox-JhF"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+            <variation key="default">
+                <mask key="constraints">
+                    <exclude reference="5J6-Fh-gVz"/>
+                    <exclude reference="C1k-E0-ntY"/>
+                    <exclude reference="NEv-hY-2aA"/>
+                    <exclude reference="gLC-Ox-JhF"/>
+                </mask>
+            </variation>
             <point key="canvasLocation" x="391" y="270"/>
         </view>
     </objects>

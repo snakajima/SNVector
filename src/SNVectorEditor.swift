@@ -49,7 +49,13 @@ class SNVectorEditor: UIViewController {
     }
     
     func extraInit(elements:[SNPathElement]) {
-        self.elements = elements
+        let path = SNPath.pathFrom(elements)
+        let frame = CGPathGetBoundingBox(path)
+        let dx = viewMain.frame.size.width / 2 - (frame.origin.x + frame.size.width/2)
+        let dy = viewMain.frame.size.height / 2 - (frame.origin.y + frame.size.height/2)
+        self.elements = elements.map({ element -> SNPathElement in
+            element.translatedElement(dx, y: dy)
+        })
         updateCurveFromElements()
         viewMain.layer.addSublayer(layerPoly)
         viewMain.layer.addSublayer(layerCurve)
