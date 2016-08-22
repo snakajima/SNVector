@@ -8,6 +8,23 @@
 
 import UIKit
 
+private protocol Undoable {
+    func redo(inout nodes:[SNNodeView])
+    func undo(inout nodes:[SNNodeView])
+}
+
+struct MoveNode: Undoable {
+    let index:Int
+    let ptOld:CGPoint
+    let ptNew:CGPoint
+    func redo(inout nodes:[SNNodeView]) {
+        nodes[index].center = ptNew
+    }
+    func undo(inout nodes:[SNNodeView]) {
+        nodes[index].center = ptOld
+    }
+}
+
 class SNVectorEditor: UIViewController {
     @IBOutlet var viewMain:UIView!
     let layerCurve = CAShapeLayer()
@@ -18,7 +35,6 @@ class SNVectorEditor: UIViewController {
     var closed = false
 
     // Transient properties
-    var offset = CGPoint.zero // for panNode
     var nodeTapped:SNNodeView? // for panTapped
     var transformLast = CGAffineTransformIdentity // for pinch & pan
     var locationLast = CGPoint.zero // pan
@@ -179,20 +195,20 @@ class SNVectorEditor: UIViewController {
     }
 
     func panNode(recognizer:UIPanGestureRecognizer) {
-        guard let subview = recognizer.view as? SNNodeView else {
+        guard let node = recognizer.view as? SNNodeView else {
             return
         }
         let pt = recognizer.locationInView(viewMain)
         switch(recognizer.state) {
         case .Began:
-            offset = pt.delta(subview.center)
+            node.offset = pt.delta(node.center)
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
-            let cp = pt.delta(offset)
-            subview.center = cp
+            let cp = pt.delta(node.offset)
+            node.center = cp
             updateElements()
         case .Ended:
-            print("panNode ended", nodes.indexOf(subview))
+            print("panNode ended", nodes.indexOf(node))
         default:
             break
         }

@@ -19,6 +19,7 @@ class SNNodeView: UIView {
             }
         }
     }
+    var offset = CGPoint.zero // for panNode
     
     init() {
         super.init(frame: CGRect(x: 0, y: 0, width: SNNodeView.radius * 2, height: SNNodeView.radius * 2))
