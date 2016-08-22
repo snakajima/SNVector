@@ -18,18 +18,29 @@ class VectorViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        editor.delegate = self
         viewMain.addSubview(editor.view)
         editor.extraInit(elements)
     }
 
     @IBAction func undo() {
         print("undo")
+        editor.undo()
     }
     
     @IBAction func redo() {
         print("redo")
+        editor.redo()
     }
 
     @IBAction func debug() {
+        editor.debug()
+    }
+}
+
+extension VectorViewController: SNVectorEditorProtocol {
+    func pathWasUpdated(editor:SNVectorEditor) {
+        btnUndo.enabled = editor.undoable
+        btnRedo.enabled = editor.redoable
     }
 }
