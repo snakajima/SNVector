@@ -9,19 +9,19 @@
 import UIKit
 
 private protocol Undoable {
-    func redo(inout nodes:[SNNodeView]) -> SNNodeView?
-    func undo(inout nodes:[SNNodeView]) -> SNNodeView?
+    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView?
+    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView?
 }
 
 private struct MoveNode: Undoable {
     let index:Int
     let ptOld:CGPoint
     let ptNew:CGPoint
-    func redo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         nodes[index].center = ptNew
         return nil
     }
-    func undo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         nodes[index].center = ptOld
         return nil
     }
@@ -30,11 +30,11 @@ private struct MoveNode: Undoable {
 private struct ToggleNode: Undoable {
     let index:Int
     let corner:Bool
-    func redo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         nodes[index].corner = corner
         return nil
     }
-    func undo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         nodes[index].corner = !corner
         return nil
     }
@@ -44,7 +44,7 @@ private struct InsertNode: Undoable {
     let index:Int
     let pt:CGPoint
     let corner:Bool
-    func redo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         let node = SNNodeView()
         node.corner = corner
         node.center = pt
@@ -52,9 +52,42 @@ private struct InsertNode: Undoable {
         return node
     }
     
-    func undo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         nodes[index].removeFromSuperview()
         nodes.removeAtIndex(index)
+        return nil
+    }
+}
+
+private struct ClosePath: Undoable {
+    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        closed = true
+        nodes.first!.corner = false
+        nodes.last!.corner = false
+        return nil
+    }
+    
+    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        closed = false
+        return nil
+    }
+}
+
+private struct OpenPath: Undoable {
+    let index:Int
+    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        closed = false
+        nodes = Array(0..<nodes.count).map {
+            nodes[($0 + index) % nodes.count]
+        }
+        return nil
+    }
+    
+    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        closed = true
+        nodes = Array(0..<nodes.count).map {
+            nodes[($0 + nodes.count - index) % nodes.count]
+        }
         return nil
     }
 }
@@ -63,13 +96,13 @@ private struct DeleteNode: Undoable {
     let index:Int
     let pt:CGPoint
     let corner:Bool
-    func redo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         nodes[index].removeFromSuperview()
         nodes.removeAtIndex(index)
         return nil
     }
     
-    func undo(inout nodes:[SNNodeView]) -> SNNodeView? {
+    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         let node = SNNodeView()
         node.corner = corner
         node.center = pt
@@ -356,6 +389,7 @@ class SNVectorEditor: UIViewController {
         nodes.first!.corner = false
         nodes.last!.corner = false
         updateElements()
+        appendUndoable(ClosePath())
     }
 
     func openPath(menuController: UIMenuController) {
@@ -365,6 +399,7 @@ class SNVectorEditor: UIViewController {
                 nodes[($0 + index) % nodes.count]
             }
             updateElements()
+            appendUndoable(OpenPath(index: index))
         }
     }
 
@@ -435,7 +470,7 @@ extension SNVectorEditor {
         assert(undoCursor > 0)
         undoCursor -= 1
         let item = undoStack[undoCursor]
-        if let node = item.undo(&nodes), let index = nodes.indexOf(node) {
+        if let node = item.undo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
             prepareNode(node)
             viewMain.insertSubview(node, atIndex: index)
         }
@@ -449,7 +484,7 @@ extension SNVectorEditor {
         assert(undoCursor < undoStack.count)
         let item = undoStack[undoCursor]
         undoCursor += 1
-        if let node = item.redo(&nodes), let index = nodes.indexOf(node) {
+        if let node = item.redo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
             prepareNode(node)
             viewMain.insertSubview(node, atIndex: index)
         }
