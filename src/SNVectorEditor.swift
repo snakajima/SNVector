@@ -30,6 +30,12 @@ class SNVectorEditor: UIViewController {
     private var nodeTapped:SNNodeView? // for panTapped
     private var transformLast = CGAffineTransformIdentity // for pinch & pan
     private var locationLast = CGPoint.zero // pan
+    
+    var nodeTransform:CGAffineTransform {
+        var xf = CGAffineTransformInvert(viewMain.transform)
+        xf.tx = 0; xf.ty = 0
+        return xf
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -147,6 +153,8 @@ class SNVectorEditor: UIViewController {
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(SNVectorEditor.doubleTapNode))
         doubleTap.numberOfTapsRequired = 2
         node.addGestureRecognizer(doubleTap)
+
+        node.transform = nodeTransform
     }
 
     private func initializeNodes() {
@@ -158,6 +166,8 @@ class SNVectorEditor: UIViewController {
 
         nodes.removeAll()
         
+        var xf = nodeTransform
+
         func addNodeViewAt(pt:CGPoint, corner:Bool) {
             let node = createNode(corner, pt: pt)
             viewMain.addSubview(node)
@@ -332,8 +342,7 @@ extension SNVectorEditor {
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
             viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
-            var xf = CGAffineTransformInvert(viewMain.transform)
-            xf.tx = 0; xf.ty = 0
+            var xf = nodeTransform
             nodes.forEach { $0.transform = xf }
         case .Ended:
             break
