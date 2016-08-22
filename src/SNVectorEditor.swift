@@ -75,6 +75,8 @@ private struct ClosePath: Undoable {
 
 private struct OpenPath: Undoable {
     let index:Int
+    let cornerFirst:Bool
+    let cornerLast:Bool
     func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         closed = false
         nodes = Array(0..<nodes.count).map {
@@ -85,6 +87,8 @@ private struct OpenPath: Undoable {
     
     func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
         closed = true
+        nodes.first!.corner = cornerFirst
+        nodes.last!.corner = cornerLast
         nodes = Array(0..<nodes.count).map {
             nodes[($0 + nodes.count - index) % nodes.count]
         }
@@ -314,8 +318,8 @@ class SNVectorEditor: UIViewController {
     func doubleTapNode(recognizer:UITapGestureRecognizer) {
         if let node = recognizer.view as? SNNodeView, let index = nodes.indexOf(node) {
             node.corner = !node.corner
-            updateElements()
             appendUndoable(ToggleNode(index: index, corner: node.corner))
+            updateElements()
 
             UIView.animateWithDuration(0.2, animations: {
                 //
@@ -359,8 +363,9 @@ class SNVectorEditor: UIViewController {
         if let node = nodeTapped, let index = nodes.indexOf(node) {
             node.removeFromSuperview()
             nodes.removeAtIndex(index)
-            updateElements()
+
             appendUndoable(DeleteNode(index: index, pt: node.center, corner: node.corner))
+            updateElements()
         }
     }
 
@@ -370,17 +375,17 @@ class SNVectorEditor: UIViewController {
             nodeCopy.transform = node.transform
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
-            updateElements()
             
             appendUndoable(InsertNode(index: index + 1, pt: nodeCopy.center, corner: nodeCopy.corner))
+            updateElements()
         }
     }
     
     func toggleNode(menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.indexOf(node) {
             node.corner = !node.corner
-            updateElements()
             appendUndoable(ToggleNode(index: index, corner: node.corner))
+            updateElements()
         }
     }
 
@@ -388,8 +393,8 @@ class SNVectorEditor: UIViewController {
         closed = true
         nodes.first!.corner = false
         nodes.last!.corner = false
-        updateElements()
         appendUndoable(ClosePath())
+        updateElements()
     }
 
     func openPath(menuController: UIMenuController) {
@@ -398,8 +403,8 @@ class SNVectorEditor: UIViewController {
             nodes = Array(0..<nodes.count).map {
                 nodes[($0 + index) % nodes.count]
             }
+            appendUndoable(OpenPath(index: index, cornerFirst: nodes.first!.corner, cornerLast: nodes.last!.corner))
             updateElements()
-            appendUndoable(OpenPath(index: index))
         }
     }
 
