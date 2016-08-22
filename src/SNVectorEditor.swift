@@ -10,6 +10,13 @@ import UIKit
 
 protocol SNVectorEditorProtocol: NSObjectProtocol {
     func pathWasUpdated(editor:SNVectorEditor)
+    func nodeColor(editor:SNVectorEditor) -> UIColor?
+}
+
+extension SNVectorEditorProtocol {
+    func nodeColor(editor:SNVectorEditor) -> UIColor? {
+        return nil
+    }
 }
 
 class SNVectorEditor: UIViewController {
@@ -66,16 +73,16 @@ class SNVectorEditor: UIViewController {
     
     private func updateCurveFromElements() {
         layerCurve.path = SNPath.pathFrom(elements)
-        layerCurve.lineWidth = 3
+        layerCurve.lineWidth = 1
         layerCurve.fillColor = UIColor.clearColor().CGColor
-        layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 1.0).CGColor
+        layerCurve.strokeColor = UIColor.blackColor().CGColor
         layerCurve.lineCap = "round"
         layerCurve.lineJoin = "round"
         
         layerPoly.path = SNPath.polyPathFrom(elements)
         layerPoly.lineWidth = 1
         layerPoly.fillColor = UIColor.clearColor().CGColor
-        layerPoly.strokeColor = UIColor(red: 0, green: 0.8, blue: 0, alpha: 1.0).CGColor
+        layerPoly.strokeColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2).CGColor
         layerPoly.lineCap = "round"
         layerPoly.lineJoin = "round"
     }
@@ -162,6 +169,11 @@ class SNVectorEditor: UIViewController {
         node.addGestureRecognizer(doubleTap)
 
         node.transform = nodeTransform
+        
+        if let color = delegate?.nodeColor(self) {
+            node.backgroundColor = color
+            node.alpha = 0.3
+        }
     }
 
     private func initializeNodes() {
