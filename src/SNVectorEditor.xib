@@ -21,7 +21,7 @@
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="LFm-Wd-zva" secondAttribute="trailing" id="5J6-Fh-gVz"/>
                 <constraint firstAttribute="bottom" secondItem="LFm-Wd-zva" secondAttribute="bottom" id="C1k-E0-ntY"/>

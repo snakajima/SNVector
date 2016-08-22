@@ -19,6 +19,8 @@ class VectorViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         editor.delegate = self
+        editor.view.frame = viewMain.bounds
+        editor.view.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
         viewMain.addSubview(editor.view)
         editor.extraInit(elements)
     }
