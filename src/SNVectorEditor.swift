@@ -14,8 +14,6 @@ protocol SNVectorEditorProtocol: NSObjectProtocol {
 
 class SNVectorEditor: UIViewController {
     @IBOutlet var viewMain:UIView!
-    @IBOutlet var btnUndo:UIBarButtonItem?
-    @IBOutlet var btnRedo:UIBarButtonItem?
     
     weak var delegate:SNVectorEditorProtocol?
     
@@ -128,7 +126,7 @@ class SNVectorEditor: UIViewController {
         updateCurveFromElements()
     }
     
-    func createNode(corner:Bool, pt:CGPoint) -> SNNodeView {
+    private func createNode(corner:Bool, pt:CGPoint) -> SNNodeView {
         let node = SNNodeView()
         node.corner = corner
         node.center = pt
@@ -136,7 +134,7 @@ class SNVectorEditor: UIViewController {
         return node
     }
     
-    func prepareNode(node:SNNodeView) {
+    private func prepareNode(node:SNNodeView) {
         let panNode = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.panNode))
         panNode.minimumNumberOfTouches = 1
         panNode.maximumNumberOfTouches = 1
@@ -348,7 +346,7 @@ class SNVectorEditor: UIViewController {
         }
     }
     
-    @IBAction func debug() {
+    func debug() {
         nodes.forEach { $0.removeFromSuperview() }
         initializeNodes()
     }
@@ -365,8 +363,6 @@ extension SNVectorEditor {
 
     private func updateUI() {
         delegate?.pathWasUpdated(self)
-        btnUndo?.enabled = undoCursor > 0
-        btnRedo?.enabled = undoCursor < undoStack.count
     }
     
     private func appendUndoable(item:Undoable) {
@@ -380,7 +376,7 @@ extension SNVectorEditor {
         updateUI()
     }
 
-    @IBAction func undo() {
+    func undo() {
         print("undo")
         assert(undoCursor > 0)
         undoCursor -= 1
@@ -394,7 +390,7 @@ extension SNVectorEditor {
         updateUI()
     }
     
-    @IBAction func redo() {
+    func redo() {
         print("redo")
         assert(undoCursor < undoStack.count)
         let item = undoStack[undoCursor]
