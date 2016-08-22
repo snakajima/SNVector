@@ -75,16 +75,19 @@ class SNVectorEditor: UIViewController {
     }
     
     private func updateElements() {
-        var last:SNNodeView?
-        var prev:SNNodeView?
+        let first = nodes.first!
+        let last:SNNodeView?
         if closed {
             last = nodes.last
         } else {
+            last = nil
             nodes.first!.corner = true
             nodes.last!.corner = true
         }
 
         elements.removeAll()
+
+        var prev:SNNodeView?
         for (i, node) in nodes.enumerate() {
             if i==0 {
                 if let last = last where !node.corner {
@@ -105,17 +108,15 @@ class SNVectorEditor: UIViewController {
                     elements.append(SNLine(pt: node.center))
                 }
                 prev = nil
-                if closed && node == nodes.last, let first = nodes.first {
-                    if first.corner {
-                        elements.append(SNLine(pt: first.center))
-                    }
+                if node == last && first.corner {
+                    elements.append(SNLine(pt: first.center))
                 }
             } else {
                 if let prev = prev {
                     elements.append(SNQuadCurve(cp: prev.center, pt: prev.center.middle(node.center)))
                 }
                 prev = node
-                if closed && node == nodes.last, let first = nodes.first {
+                if node == last {
                     if first.corner {
                         elements.append(SNQuadCurve(cp: node.center, pt: first.center))
                     } else {
@@ -340,7 +341,6 @@ extension SNVectorEditor {
             return
         }
         let pt = recognizer.locationInView(view)
-        print("pt=", pt)
         switch(recognizer.state) {
         case .Began:
             locationLast = pt
