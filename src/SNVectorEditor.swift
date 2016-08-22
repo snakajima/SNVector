@@ -336,15 +336,20 @@ extension SNVectorEditor {
 // MARK: Pinch & Zoom, Panning of main view
 extension SNVectorEditor {
     func pinch(recognizer:UIPinchGestureRecognizer) {
+        if recognizer.numberOfTouches() != 2 {
+            return
+        }
+        let pt = recognizer.locationInView(view)
+        print("pt=", pt)
         switch(recognizer.state) {
         case .Began:
-            locationLast = recognizer.locationInView(view)
+            locationLast = pt
             transformLast = viewMain.transform
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
-            //viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+            let offset = pt.delta(locationLast)
             let delta = locationLast.delta(view.center)
-            var xf = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+            var xf = CGAffineTransformTranslate(transformLast, offset.x + delta.x, offset.y + delta.y)
             xf = CGAffineTransformScale(xf, recognizer.scale, recognizer.scale)
             viewMain.transform = CGAffineTransformTranslate(xf, -delta.x, -delta.y)
             let xfNode = nodeTransform
