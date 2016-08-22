@@ -338,12 +338,17 @@ extension SNVectorEditor {
     func pinch(recognizer:UIPinchGestureRecognizer) {
         switch(recognizer.state) {
         case .Began:
+            locationLast = recognizer.locationInView(view)
             transformLast = viewMain.transform
             UIMenuController.sharedMenuController().menuVisible = false
         case .Changed:
-            viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
-            let xf = nodeTransform
-            nodes.forEach { $0.transform = xf }
+            //viewMain.transform = CGAffineTransformScale(transformLast, recognizer.scale, recognizer.scale)
+            let delta = locationLast.delta(view.center)
+            var xf = CGAffineTransformTranslate(transformLast, delta.x, delta.y)
+            xf = CGAffineTransformScale(xf, recognizer.scale, recognizer.scale)
+            viewMain.transform = CGAffineTransformTranslate(xf, -delta.x, -delta.y)
+            let xfNode = nodeTransform
+            nodes.forEach { $0.transform = xfNode }
         case .Ended:
             break
         default:
