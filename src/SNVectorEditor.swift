@@ -13,7 +13,7 @@ private protocol Undoable {
     func undo(inout nodes:[SNNodeView])
 }
 
-struct MoveNode: Undoable {
+private struct MoveNode: Undoable {
     let index:Int
     let ptOld:CGPoint
     let ptNew:CGPoint
@@ -22,6 +22,17 @@ struct MoveNode: Undoable {
     }
     func undo(inout nodes:[SNNodeView]) {
         nodes[index].center = ptOld
+    }
+}
+
+private struct ToggleNode: Undoable {
+    let index:Int
+    let fNew:Bool
+    func redo(inout nodes:[SNNodeView]) {
+        nodes[index].corner = fNew
+    }
+    func undo(inout nodes:[SNNodeView]) {
+        nodes[index].corner = !fNew
     }
 }
 
@@ -223,9 +234,11 @@ class SNVectorEditor: UIViewController {
     }
 
     func doubleTapNode(recognizer:UITapGestureRecognizer) {
-        if let node = recognizer.view as? SNNodeView {
+        if let node = recognizer.view as? SNNodeView, let index = nodes.indexOf(node) {
             node.corner = !node.corner
             updateElements()
+            appendUndoable(ToggleNode(index: index, fNew: node.corner))
+
             UIView.animateWithDuration(0.2, animations: {
                 //
             }, completion: { (_) in
@@ -283,9 +296,10 @@ class SNVectorEditor: UIViewController {
     }
     
     func toggleNode(menuController: UIMenuController) {
-        if let node = nodeTapped {
+        if let node = nodeTapped, let index = nodes.indexOf(node) {
             node.corner = !node.corner
             updateElements()
+            appendUndoable(ToggleNode(index: index, fNew: node.corner))
         }
     }
 
