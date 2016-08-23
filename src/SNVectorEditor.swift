@@ -320,7 +320,8 @@ extension SNVectorEditor {
 
     func duplicateNode(menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.indexOf(node) {
-            let nodeCopy = createNode(node.corner, pt:node.center.translate(SNNodeView.radius * 2, y: 0))
+            let delta = CGPointApplyAffineTransform(CGPoint(x:SNNodeView.radius * 2, y:0), nodeTransform)
+            let nodeCopy = createNode(node.corner, pt:node.center.translate(delta.x, y: delta.y))
             nodeCopy.transform = node.transform
             nodes.insert(nodeCopy, atIndex: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
