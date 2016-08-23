@@ -24,8 +24,24 @@ class SNVectorEditor: UIViewController {
     
     weak var delegate:SNVectorEditorProtocol?
     
-    private let layerCurve = CAShapeLayer()
-    private let layerPoly = CAShapeLayer()
+    private let layerCurve:CAShapeLayer = {
+        let layer = CAShapeLayer()
+        layer.lineWidth = 1
+        layer.fillColor = UIColor.clearColor().CGColor
+        layer.strokeColor = UIColor.blackColor().CGColor
+        layer.lineCap = "round"
+        layer.lineJoin = "round"
+        return layer
+    }()
+    private let layerPoly:CAShapeLayer = {
+        let layer = CAShapeLayer()
+        layer.lineWidth = 1
+        layer.fillColor = UIColor.clearColor().CGColor
+        layer.strokeColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2).CGColor
+        layer.lineCap = "round"
+        layer.lineJoin = "round"
+        return layer
+    }()
     
     var elements = [SNPathElement]()
     private var nodes = [SNNodeView]()
@@ -47,6 +63,9 @@ class SNVectorEditor: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        viewMain.layer.addSublayer(layerPoly)
+        viewMain.layer.addSublayer(layerCurve)
+
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(SNVectorEditor.pinch))
         self.view.addGestureRecognizer(pinch)
         let pan = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.pan))
@@ -63,28 +82,15 @@ class SNVectorEditor: UIViewController {
         self.elements = elements.map({ element -> SNPathElement in
             element.translatedElement(dx, y: dy)
         })
-        updateCurveFromElements()
-        viewMain.layer.addSublayer(layerPoly)
-        viewMain.layer.addSublayer(layerCurve)
         
+        updateCurveFromElements()
         initializeNodes()
         updateUI()
     }
     
     private func updateCurveFromElements() {
         layerCurve.path = SNPath.pathFrom(elements)
-        layerCurve.lineWidth = 1
-        layerCurve.fillColor = UIColor.clearColor().CGColor
-        layerCurve.strokeColor = UIColor.blackColor().CGColor
-        layerCurve.lineCap = "round"
-        layerCurve.lineJoin = "round"
-        
         layerPoly.path = SNPath.polyPathFrom(elements)
-        layerPoly.lineWidth = 1
-        layerPoly.fillColor = UIColor.clearColor().CGColor
-        layerPoly.strokeColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2).CGColor
-        layerPoly.lineCap = "round"
-        layerPoly.lineJoin = "round"
     }
     
     private func updateElements() {
@@ -93,9 +99,9 @@ class SNVectorEditor: UIViewController {
         if closed {
             last = nodes.last
         } else {
-            last = nil
-            nodes.first!.corner = true
+            first.corner = true
             nodes.last!.corner = true
+            last = nil
         }
 
         elements.removeAll()
