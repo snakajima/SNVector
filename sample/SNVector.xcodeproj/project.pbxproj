@@ -11,6 +11,7 @@
 		746970F21D69690900A8B6B1 /* SNVectorEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746970F01D69690900A8B6B1 /* SNVectorEditor.swift */; };
 		746970F41D6B0F0700A8B6B1 /* VectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746970F31D6B0F0700A8B6B1 /* VectorViewController.swift */; };
 		746970F61D6B121300A8B6B1 /* SNVectorEditor.xib in Resources */ = {isa = PBXBuildFile; fileRef = 746970F51D6B121300A8B6B1 /* SNVectorEditor.xib */; };
+		7473AC5F1D6E12BD00DA34B1 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7473AC5E1D6E12BD00DA34B1 /* LICENSE.txt */; };
 		74F4137F1D63DA04006F765E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F4137E1D63DA04006F765E /* AppDelegate.swift */; };
 		74F413811D63DA04006F765E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F413801D63DA04006F765E /* ViewController.swift */; };
 		74F413841D63DA04006F765E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74F413821D63DA04006F765E /* Main.storyboard */; };
@@ -26,6 +27,7 @@
 		746970F01D69690900A8B6B1 /* SNVectorEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SNVectorEditor.swift; sourceTree = "<group>"; };
 		746970F31D6B0F0700A8B6B1 /* VectorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorViewController.swift; sourceTree = "<group>"; };
 		746970F51D6B121300A8B6B1 /* SNVectorEditor.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNVectorEditor.xib; sourceTree = "<group>"; };
+		7473AC5E1D6E12BD00DA34B1 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		74F4137B1D63DA04006F765E /* SNVector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNVector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74F4137E1D63DA04006F765E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74F413801D63DA04006F765E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 		74F4137D1D63DA04006F765E /* SNVector */ = {
 			isa = PBXGroup;
 			children = (
+				7473AC5E1D6E12BD00DA34B1 /* LICENSE.txt */,
 				74F4139A1D640D93006F765E /* README.md */,
 				74F4137E1D63DA04006F765E /* AppDelegate.swift */,
 				74F413801D63DA04006F765E /* ViewController.swift */,
@@ -166,6 +169,7 @@
 				74F413891D63DA04006F765E /* LaunchScreen.storyboard in Resources */,
 				74F413861D63DA04006F765E /* Assets.xcassets in Resources */,
 				746970F61D6B121300A8B6B1 /* SNVectorEditor.xib in Resources */,
+				7473AC5F1D6E12BD00DA34B1 /* LICENSE.txt in Resources */,
 				74F413841D63DA04006F765E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
