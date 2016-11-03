@@ -9,12 +9,12 @@
 import UIKit
 
 protocol SNVectorEditorProtocol: NSObjectProtocol {
-    func pathWasUpdated(editor:SNVectorEditor)
-    func nodeColor(editor:SNVectorEditor) -> UIColor?
+    func pathWasUpdated(_ editor:SNVectorEditor)
+    func nodeColor(_ editor:SNVectorEditor) -> UIColor?
 }
 
 extension SNVectorEditorProtocol {
-    func nodeColor(editor:SNVectorEditor) -> UIColor? {
+    func nodeColor(_ editor:SNVectorEditor) -> UIColor? {
         return nil
     }
 }
@@ -27,8 +27,8 @@ class SNVectorEditor: UIViewController {
     private let layerCurve:CAShapeLayer = {
         let layer = CAShapeLayer()
         layer.lineWidth = 1
-        layer.fillColor = UIColor.clearColor().CGColor
-        layer.strokeColor = UIColor.blackColor().CGColor
+        layer.fillColor = UIColor.clear.cgColor
+        layer.strokeColor = UIColor.black.cgColor
         layer.lineCap = "round"
         layer.lineJoin = "round"
         return layer
@@ -36,26 +36,26 @@ class SNVectorEditor: UIViewController {
     private let layerPoly:CAShapeLayer = {
         let layer = CAShapeLayer()
         layer.lineWidth = 1
-        layer.fillColor = UIColor.clearColor().CGColor
-        layer.strokeColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2).CGColor
+        layer.fillColor = UIColor.clear.cgColor
+        layer.strokeColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2).cgColor
         layer.lineCap = "round"
         layer.lineJoin = "round"
         return layer
     }()
     
     var elements = [SNPathElement]()
-    private var nodes = [SNNodeView]()
-    private var closed = false
-    private var undoStack = [Undoable]()
-    private var undoCursor = 0
+    fileprivate var nodes = [SNNodeView]()
+    fileprivate var closed = false
+    fileprivate var undoStack = [Undoable]()
+    fileprivate var undoCursor = 0
 
     // Transient properties
-    private var nodeTapped:SNNodeView? // for panTapped
-    private var transformLast = CGAffineTransformIdentity // for pinch & pan
-    private var locationLast = CGPoint.zero // pan
+    fileprivate var nodeTapped:SNNodeView? // for panTapped
+    fileprivate var transformLast = CGAffineTransform.identity // for pinch & pan
+    fileprivate var locationLast = CGPoint.zero // pan
     
     var nodeTransform:CGAffineTransform {
-        var xf = CGAffineTransformInvert(viewMain.transform)
+        var xf = viewMain.transform.inverted()
         xf.tx = 0; xf.ty = 0
         return xf
     }
@@ -74,13 +74,13 @@ class SNVectorEditor: UIViewController {
         self.view.addGestureRecognizer(pan)
     }
     
-    func extraInit(elements:[SNPathElement]) {
-        let path = SNPath.pathFrom(elements)
-        let frame = CGPathGetPathBoundingBox(path)
+    func extraInit(_ elements:[SNPathElement]) {
+        let path = SNPath.path(from: elements)
+        let frame = path.boundingBoxOfPath
         let dx = viewMain.frame.size.width / 2 - (frame.origin.x + frame.size.width/2)
         let dy = viewMain.frame.size.height / 2 - (frame.origin.y + frame.size.height/2)
         self.elements = elements.map({ element -> SNPathElement in
-            element.translatedElement(dx, y: dy)
+            element.translatedElement(x: dx, y: dy)
         })
         
         updateCurveFromElements()
@@ -89,11 +89,11 @@ class SNVectorEditor: UIViewController {
     }
     
     private func updateCurveFromElements() {
-        layerCurve.path = SNPath.pathFrom(elements)
-        layerPoly.path = SNPath.polyPathFrom(elements)
+        layerCurve.path = SNPath.path(from: elements)
+        layerPoly.path = SNPath.polyPath(from: elements)
     }
     
-    private func updateElements() {
+    fileprivate func updateElements() {
         let first = nodes.first!
         let last:SNNodeView?
         if closed {
@@ -107,9 +107,9 @@ class SNVectorEditor: UIViewController {
         elements.removeAll()
 
         var prev:SNNodeView?
-        for (i, node) in nodes.enumerate() {
+        for (i, node) in nodes.enumerated() {
             if i==0 {
-                if let last = last where !node.corner {
+                if let last = last, !node.corner {
                     if !last.corner {
                         elements.append(SNMove(pt: last.center.middle(node.center)))
                     } else {
@@ -152,7 +152,7 @@ class SNVectorEditor: UIViewController {
         updateCurveFromElements()
     }
     
-    private func createNode(corner:Bool, pt:CGPoint) -> SNNodeView {
+    fileprivate func createNode(_ corner:Bool, pt:CGPoint) -> SNNodeView {
         let node = SNNodeView()
         node.corner = corner
         node.center = pt
@@ -160,7 +160,7 @@ class SNVectorEditor: UIViewController {
         return node
     }
     
-    private func prepareNode(node:SNNodeView) {
+    fileprivate func prepareNode(_ node:SNNodeView) {
         let panNode = UIPanGestureRecognizer(target: self, action: #selector(SNVectorEditor.panNode))
         panNode.minimumNumberOfTouches = 1
         panNode.maximumNumberOfTouches = 1
@@ -182,7 +182,7 @@ class SNVectorEditor: UIViewController {
         }
     }
 
-    private func initializeNodes() {
+    fileprivate func initializeNodes() {
         var elements = self.elements // making a copy
         if elements.last is SNCloseSubpath {
             closed = true
@@ -193,35 +193,35 @@ class SNVectorEditor: UIViewController {
         
         var xf = nodeTransform
 
-        func addNodeViewAt(pt:CGPoint, corner:Bool) {
+        func addNodeView(at pt:CGPoint, corner:Bool) {
             let node = createNode(corner, pt: pt)
             viewMain.addSubview(node)
             nodes.append(node)
         }
         
-        for (index, element) in elements.enumerate() {
+        for (index, element) in elements.enumerated() {
             switch(element) {
             case let move as SNMove where index==0:
                 if closed, let next = elements[1] as? SNQuadCurve,
-                   let last = elements.last as? SNQuadCurve
-                         where last.pt.distance2(last.cp.middle(next.cp)) < 1 {
+                   let last = elements.last as? SNQuadCurve,
+                       last.pt.distance2(last.cp.middle(next.cp)) < 1 {
                     break
                 }
-                addNodeViewAt(move.pt, corner:true)
+                addNodeView(at:move.pt, corner:true)
             case _ as SNLine where closed && index + 1 == elements.count:
                 break
             case let line as SNLine:
-                addNodeViewAt(line.pt, corner:true)
+                addNodeView(at:line.pt, corner:true)
             case let quad as SNQuadCurve where closed && index + 1 == elements.count:
-                addNodeViewAt(quad.cp, corner:false)
+                addNodeView(at:quad.cp, corner:false)
             case let quad as SNQuadCurve:
-                addNodeViewAt(quad.cp, corner:false)
+                addNodeView(at:quad.cp, corner:false)
                 if index + 1 < elements.count,
-                   let next = elements[(index + 1) % elements.count] as? SNQuadCurve
-                        where quad.pt.distance2(quad.cp.middle(next.cp)) < 1 {
+                   let next = elements[(index + 1) % elements.count] as? SNQuadCurve,
+                       quad.pt.distance2(quad.cp.middle(next.cp)) < 1 {
                     break
                 }
-                addNodeViewAt(quad.pt, corner:true)
+                addNodeView(at:quad.pt, corner:true)
             default:
                 print("unsupported 0")
             }
@@ -235,18 +235,18 @@ extension SNVectorEditor {
         guard let node = recognizer.view as? SNNodeView else {
             return
         }
-        let pt = recognizer.locationInView(viewMain)
+        let pt = recognizer.location(in: viewMain)
         switch(recognizer.state) {
-        case .Began:
+        case .began:
             node.lastCenter = node.center
             node.offset = pt.delta(node.center)
-            UIMenuController.sharedMenuController().menuVisible = false
-        case .Changed:
+            UIMenuController.shared.isMenuVisible = false
+        case .changed:
             let cp = pt.delta(node.offset)
             node.center = cp
             updateElements()
-        case .Ended:
-            let index = nodes.indexOf(node)!
+        case .ended:
+            let index = nodes.index(of: node)!
             appendUndoable(MoveNode(index: index, ptOld: node.lastCenter, ptNew: node.center))
         default:
             break
@@ -265,16 +265,16 @@ extension SNVectorEditor {
 // MARK: Popup menu
 extension SNVectorEditor {
     func doubleTapNode(recognizer:UITapGestureRecognizer) {
-        if let node = recognizer.view as? SNNodeView, let index = nodes.indexOf(node) {
+        if let node = recognizer.view as? SNNodeView, let index = nodes.index(of: node) {
             node.corner = !node.corner
             appendUndoable(ToggleNode(index: index, corner: node.corner))
             updateElements()
 
-            UIView.animateWithDuration(0.2, animations: {
+            UIView.animate(withDuration: 0.2, animations: {
                 //
             }, completion: { (_) in
-                let mc = UIMenuController.sharedMenuController()
-                mc.menuVisible = false
+                let mc = UIMenuController.shared
+                mc.isMenuVisible = false
             })
         }
     }
@@ -283,12 +283,12 @@ extension SNVectorEditor {
         if let node = recognizer.view as? SNNodeView {
             nodeTapped = node
             node.becomeFirstResponder()
-            let mc = UIMenuController.sharedMenuController()
+            let mc = UIMenuController.shared
             
             var frame = node.bounds
-            let offset = recognizer.locationInView(node)
-            frame.origin = recognizer.locationInView(self.view).translate(-offset.x, y: -offset.y)
-            mc.setTargetRect(frame, inView: self.view)
+            let offset = recognizer.location(in: node)
+            frame.origin = recognizer.location(in: self.view).translate(x: -offset.x, y: -offset.y)
+            mc.setTargetRect(frame, in: self.view)
             
             var menuItems = [UIMenuItem]()
             if !closed && (node == nodes.first || node == nodes.last) {
@@ -304,26 +304,26 @@ extension SNVectorEditor {
                 menuItems.append(UIMenuItem(title: "Delete", action: #selector(SNVectorEditor.deleteNode(_:))))
             }
             mc.menuItems = menuItems
-            mc.menuVisible = true
+            mc.isMenuVisible = true
         }
     }
 
-    func deleteNode(menuController: UIMenuController) {
-        if let node = nodeTapped, let index = nodes.indexOf(node) {
+    func deleteNode(_ menuController: UIMenuController) {
+        if let node = nodeTapped, let index = nodes.index(of: node) {
             node.removeFromSuperview()
-            nodes.removeAtIndex(index)
+            nodes.remove(at: index)
 
             appendUndoable(DeleteNode(index: index, pt: node.center, corner: node.corner))
             updateElements()
         }
     }
 
-    func duplicateNode(menuController: UIMenuController) {
-        if let node = nodeTapped, let index = nodes.indexOf(node) {
-            let delta = CGPointApplyAffineTransform(CGPoint(x:SNNodeView.radius * 2, y:0), nodeTransform)
-            let nodeCopy = createNode(node.corner, pt:node.center.translate(delta.x, y: delta.y))
+    func duplicateNode(_ menuController: UIMenuController) {
+        if let node = nodeTapped, let index = nodes.index(of: node) {
+            let delta = CGPoint(x:SNNodeView.radius * 2, y:0).applying(nodeTransform)
+            let nodeCopy = createNode(node.corner, pt:node.center.translate(x: delta.x, y: delta.y))
             nodeCopy.transform = node.transform
-            nodes.insert(nodeCopy, atIndex: index + 1)
+            nodes.insert(nodeCopy, at: index + 1)
             viewMain.insertSubview(nodeCopy, aboveSubview: node)
             
             appendUndoable(InsertNode(index: index + 1, pt: nodeCopy.center, corner: nodeCopy.corner))
@@ -331,15 +331,15 @@ extension SNVectorEditor {
         }
     }
     
-    func toggleNode(menuController: UIMenuController) {
-        if let node = nodeTapped, let index = nodes.indexOf(node) {
+    func toggleNode(_ menuController: UIMenuController) {
+        if let node = nodeTapped, let index = nodes.index(of: node) {
             node.corner = !node.corner
             appendUndoable(ToggleNode(index: index, corner: node.corner))
             updateElements()
         }
     }
 
-    func closePath(menuController: UIMenuController) {
+    func closePath(_ menuController: UIMenuController) {
         closed = true
         nodes.first!.corner = false
         nodes.last!.corner = false
@@ -347,8 +347,8 @@ extension SNVectorEditor {
         updateElements()
     }
 
-    func openPath(menuController: UIMenuController) {
-        if let node = nodeTapped, let index = nodes.indexOf(node) {
+    func openPath(_ menuController: UIMenuController) {
+        if let node = nodeTapped, let index = nodes.index(of: node) {
             closed = false
             nodes = Array(0..<nodes.count).map {
                 nodes[($0 + index) % nodes.count]
@@ -362,24 +362,24 @@ extension SNVectorEditor {
 // MARK: Pinch & Zoom, Panning of main view
 extension SNVectorEditor {
     func pinch(recognizer:UIPinchGestureRecognizer) {
-        if recognizer.numberOfTouches() != 2 {
+        if recognizer.numberOfTouches != 2 {
             return
         }
-        let pt = recognizer.locationInView(view)
+        let pt = recognizer.location(in: view)
         switch(recognizer.state) {
-        case .Began:
+        case .began:
             locationLast = pt
             transformLast = viewMain.transform
-            UIMenuController.sharedMenuController().menuVisible = false
-        case .Changed:
+            UIMenuController.shared.isMenuVisible = false
+        case .changed:
             let offset = pt.delta(locationLast)
             let delta = locationLast.delta(view.center)
-            var xf = CGAffineTransformTranslate(transformLast, offset.x + delta.x, offset.y + delta.y)
-            xf = CGAffineTransformScale(xf, recognizer.scale, recognizer.scale)
-            viewMain.transform = CGAffineTransformTranslate(xf, -delta.x, -delta.y)
+            var xf = transformLast.translatedBy(x: offset.x + delta.x, y: offset.y + delta.y)
+            xf = xf.scaledBy(x: recognizer.scale, y: recognizer.scale)
+            viewMain.transform = xf.translatedBy(x: -delta.x, y: -delta.y)
             let xfNode = nodeTransform
             nodes.forEach { $0.transform = xfNode }
-        case .Ended:
+        case .ended:
             break
         default:
             viewMain.transform = transformLast
@@ -387,20 +387,20 @@ extension SNVectorEditor {
     }
     
     func pan(recognizer:UIPanGestureRecognizer) {
-        if recognizer.numberOfTouches() != 2 {
+        if recognizer.numberOfTouches != 2 {
             return
         }
-        let pt = recognizer.locationInView(view)
+        let pt = recognizer.location(in: view)
         switch(recognizer.state) {
-        case .Began:
+        case .began:
             transformLast = viewMain.transform
             locationLast = pt
-            UIMenuController.sharedMenuController().menuVisible = false
-        case .Changed:
+            UIMenuController.shared.isMenuVisible = false
+        case .changed:
             let delta = pt.delta(locationLast)
             let a = viewMain.transform.a
-            viewMain.transform = CGAffineTransformTranslate(transformLast, delta.x / a, delta.y / a)
-        case .Ended:
+            viewMain.transform = transformLast.translatedBy(x: delta.x / a, y: delta.y / a)
+        case .ended:
             break
         default:
             viewMain.transform = transformLast
@@ -417,11 +417,11 @@ extension SNVectorEditor {
         return undoCursor < undoStack.count
     }
 
-    private func updateUI() {
+    fileprivate func updateUI() {
         delegate?.pathWasUpdated(self)
     }
     
-    private func appendUndoable(item:Undoable) {
+    fileprivate func appendUndoable(_ item:Undoable) {
         if undoCursor < undoStack.count {
             undoStack.removeLast(undoStack.count - undoCursor)
         }
@@ -436,9 +436,9 @@ extension SNVectorEditor {
         if undoable {
             undoCursor -= 1
             let item = undoStack[undoCursor]
-            if let node = item.undo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
+            if let node = item.undo(&nodes, closed: &closed), let index = nodes.index(of: node) {
                 prepareNode(node)
-                viewMain.insertSubview(node, atIndex: index)
+                viewMain.insertSubview(node, at: index)
             }
 
             updateElements()
@@ -450,9 +450,9 @@ extension SNVectorEditor {
         if redoable {
             let item = undoStack[undoCursor]
             undoCursor += 1
-            if let node = item.redo(&nodes, closed: &closed), let index = nodes.indexOf(node) {
+            if let node = item.redo(&nodes, closed: &closed), let index = nodes.index(of: node) {
                 prepareNode(node)
-                viewMain.insertSubview(node, atIndex: index)
+                viewMain.insertSubview(node, at: index)
             }
 
             updateElements()
@@ -460,71 +460,71 @@ extension SNVectorEditor {
         }
     }
 
-    private struct MoveNode: Undoable {
+    fileprivate struct MoveNode: Undoable {
         let index:Int
         let ptOld:CGPoint
         let ptNew:CGPoint
-        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func redo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             nodes[index].center = ptNew
             return nil
         }
-        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func undo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             nodes[index].center = ptOld
             return nil
         }
     }
 
-    private struct ToggleNode: Undoable {
+    fileprivate struct ToggleNode: Undoable {
         let index:Int
         let corner:Bool
-        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func redo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             nodes[index].corner = corner
             return nil
         }
-        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func undo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             nodes[index].corner = !corner
             return nil
         }
     }
 
-    private struct InsertNode: Undoable {
+    fileprivate struct InsertNode: Undoable {
         let index:Int
         let pt:CGPoint
         let corner:Bool
-        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func redo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             let node = SNNodeView()
             node.corner = corner
             node.center = pt
-            nodes.insert(node, atIndex: index)
+            nodes.insert(node, at: index)
             return node
         }
         
-        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func undo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             nodes[index].removeFromSuperview()
-            nodes.removeAtIndex(index)
+            nodes.remove(at: index)
             return nil
         }
     }
 
-    private struct ClosePath: Undoable {
-        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+    fileprivate struct ClosePath: Undoable {
+        func redo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             closed = true
             nodes.first!.corner = false
             nodes.last!.corner = false
             return nil
         }
         
-        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func undo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             closed = false
             return nil
         }
     }
 
-    private struct OpenPath: Undoable {
+    fileprivate struct OpenPath: Undoable {
         let index:Int
         let cornerFirst:Bool
         let cornerLast:Bool
-        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func redo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             closed = false
             nodes = Array(0..<nodes.count).map {
                 nodes[($0 + index) % nodes.count]
@@ -532,7 +532,7 @@ extension SNVectorEditor {
             return nil
         }
         
-        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func undo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             closed = true
             nodes.first!.corner = cornerFirst
             nodes.last!.corner = cornerLast
@@ -543,30 +543,30 @@ extension SNVectorEditor {
         }
     }
 
-    private struct DeleteNode: Undoable {
+    fileprivate struct DeleteNode: Undoable {
         let index:Int
         let pt:CGPoint
         let corner:Bool
-        func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func redo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             nodes[index].removeFromSuperview()
-            nodes.removeAtIndex(index)
+            nodes.remove(at: index)
             return nil
         }
         
-        func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView? {
+        func undo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView? {
             let node = SNNodeView()
             node.corner = corner
             node.center = pt
-            nodes.insert(node, atIndex: index)
+            nodes.insert(node, at: index)
             return node
         }
     }
 
 }
 
-private protocol Undoable {
-    func redo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView?
-    func undo(inout nodes:[SNNodeView], inout closed:Bool) -> SNNodeView?
+fileprivate protocol Undoable {
+    func redo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView?
+    func undo(_ nodes:inout [SNNodeView], closed:inout Bool) -> SNNodeView?
 }
 
     
