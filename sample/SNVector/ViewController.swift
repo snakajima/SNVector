@@ -21,8 +21,8 @@ class ViewController: UIViewController {
         //drawView.builder.minSegment = 40.0
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let editor = segue.destinationViewController as? VectorViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let editor = segue.destination as? VectorViewController {
             editor.elements = drawView.builder.elements
         }
     }
@@ -30,27 +30,27 @@ class ViewController: UIViewController {
 }
 
 extension ViewController : SNDrawViewDelegate {
-    func didComplete(elements:[SNPathElement]) -> Bool {
+    func didComplete(_ elements:[SNPathElement]) -> Bool {
         let layerCurve = CAShapeLayer()
         
-        layerCurve.path = SNPath.pathFrom(elements)
+        layerCurve.path = SNPath.path(from: elements)
         layerCurve.lineWidth = 10
-        layerCurve.fillColor = UIColor.clearColor().CGColor
-        layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 0.3).CGColor
+        layerCurve.fillColor = UIColor.clear.cgColor
+        layerCurve.strokeColor = UIColor(red: 0, green: 0, blue: 1, alpha: 0.3).cgColor
         layerCurve.lineCap = "round"
         layerCurve.lineJoin = "round"
         self.view.layer.addSublayer(layerCurve)
         layers.append(layerCurve)
 
         let layerLine = CAShapeLayer()
-        layerLine.path = SNPath.polyPathFrom(elements)
+        layerLine.path = SNPath.polyPath(from: elements)
         layerLine.lineWidth = 2
-        layerLine.fillColor = UIColor.clearColor().CGColor
-        layerLine.strokeColor = UIColor(red: 0, green: 0, blue: 0.5, alpha: 1.0).CGColor
+        layerLine.fillColor = UIColor.clear.cgColor
+        layerLine.strokeColor = UIColor(red: 0, green: 0, blue: 0.5, alpha: 1.0).cgColor
         self.view.layer.addSublayer(layerLine)
         layers.append(layerLine)
         
-        self.performSegueWithIdentifier("edit", sender: nil)
+        self.performSegue(withIdentifier: "edit", sender: nil)
 
         return true
     }

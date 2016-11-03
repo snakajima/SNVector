@@ -20,7 +20,7 @@ class VectorViewController: UIViewController {
         super.viewDidLoad()
         editor.delegate = self
         editor.view.frame = viewMain.bounds
-        editor.view.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
+        editor.view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         viewMain.addSubview(editor.view)
         editor.extraInit(elements)
     }
@@ -39,8 +39,8 @@ class VectorViewController: UIViewController {
 }
 
 extension VectorViewController: SNVectorEditorProtocol {
-    func pathWasUpdated(editor:SNVectorEditor) {
-        btnUndo.enabled = editor.undoable
-        btnRedo.enabled = editor.redoable
+    func pathWasUpdated(_ editor:SNVectorEditor) {
+        btnUndo.isEnabled = editor.undoable
+        btnRedo.isEnabled = editor.redoable
     }
 }
