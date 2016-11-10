@@ -33,7 +33,7 @@ class SNNodeView: UIView {
         super.init(coder: coder)!
     }
     
-    override func canBecomeFirstResponder() -> Bool {
+    override var canBecomeFirstResponder: Bool {
         return true
     }
 }
