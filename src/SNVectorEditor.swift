@@ -29,8 +29,8 @@ class SNVectorEditor: UIViewController {
         layer.lineWidth = 1
         layer.fillColor = UIColor.clear.cgColor
         layer.strokeColor = UIColor.black.cgColor
-        layer.lineCap = "round"
-        layer.lineJoin = "round"
+        layer.lineCap = convertToCAShapeLayerLineCap("round")
+        layer.lineJoin = convertToCAShapeLayerLineJoin("round")
         return layer
     }()
     private let layerPoly:CAShapeLayer = {
@@ -38,8 +38,8 @@ class SNVectorEditor: UIViewController {
         layer.lineWidth = 1
         layer.fillColor = UIColor.clear.cgColor
         layer.strokeColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2).cgColor
-        layer.lineCap = "round"
-        layer.lineJoin = "round"
+        layer.lineCap = convertToCAShapeLayerLineCap("round")
+        layer.lineJoin = convertToCAShapeLayerLineJoin("round")
         return layer
     }()
     
@@ -231,7 +231,7 @@ class SNVectorEditor: UIViewController {
 
 // MARK: Moving Nodes around
 extension SNVectorEditor {
-    func panNode(recognizer:UIPanGestureRecognizer) {
+    @objc func panNode(recognizer:UIPanGestureRecognizer) {
         guard let node = recognizer.view as? SNNodeView else {
             return
         }
@@ -264,7 +264,7 @@ extension SNVectorEditor {
 
 // MARK: Popup menu
 extension SNVectorEditor {
-    func doubleTapNode(recognizer:UITapGestureRecognizer) {
+    @objc func doubleTapNode(recognizer:UITapGestureRecognizer) {
         if let node = recognizer.view as? SNNodeView, let index = nodes.index(of: node) {
             node.corner = !node.corner
             appendUndoable(ToggleNode(index: index, corner: node.corner))
@@ -279,7 +279,7 @@ extension SNVectorEditor {
         }
     }
     
-    func tapNode(recognizer:UITapGestureRecognizer) {
+    @objc func tapNode(recognizer:UITapGestureRecognizer) {
         if let node = recognizer.view as? SNNodeView {
             nodeTapped = node
             node.becomeFirstResponder()
@@ -308,7 +308,7 @@ extension SNVectorEditor {
         }
     }
 
-    func deleteNode(_ menuController: UIMenuController) {
+    @objc func deleteNode(_ menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.index(of: node) {
             node.removeFromSuperview()
             nodes.remove(at: index)
@@ -318,7 +318,7 @@ extension SNVectorEditor {
         }
     }
 
-    func duplicateNode(_ menuController: UIMenuController) {
+    @objc func duplicateNode(_ menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.index(of: node) {
             let delta = CGPoint(x:SNNodeView.radius * 2, y:0).applying(nodeTransform)
             let nodeCopy = createNode(node.corner, pt:node.center.translate(x: delta.x, y: delta.y))
@@ -331,7 +331,7 @@ extension SNVectorEditor {
         }
     }
     
-    func toggleNode(_ menuController: UIMenuController) {
+    @objc func toggleNode(_ menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.index(of: node) {
             node.corner = !node.corner
             appendUndoable(ToggleNode(index: index, corner: node.corner))
@@ -339,7 +339,7 @@ extension SNVectorEditor {
         }
     }
 
-    func closePath(_ menuController: UIMenuController) {
+    @objc func closePath(_ menuController: UIMenuController) {
         closed = true
         nodes.first!.corner = false
         nodes.last!.corner = false
@@ -347,7 +347,7 @@ extension SNVectorEditor {
         updateElements()
     }
 
-    func openPath(_ menuController: UIMenuController) {
+    @objc func openPath(_ menuController: UIMenuController) {
         if let node = nodeTapped, let index = nodes.index(of: node) {
             closed = false
             nodes = Array(0..<nodes.count).map {
@@ -361,7 +361,7 @@ extension SNVectorEditor {
 
 // MARK: Pinch & Zoom, Panning of main view
 extension SNVectorEditor {
-    func pinch(recognizer:UIPinchGestureRecognizer) {
+    @objc func pinch(recognizer:UIPinchGestureRecognizer) {
         if recognizer.numberOfTouches != 2 {
             return
         }
@@ -386,7 +386,7 @@ extension SNVectorEditor {
         }
     }
     
-    func pan(recognizer:UIPanGestureRecognizer) {
+    @objc func pan(recognizer:UIPanGestureRecognizer) {
         if recognizer.numberOfTouches != 2 {
             return
         }
@@ -570,3 +570,13 @@ fileprivate protocol Undoable {
 }
 
     
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToCAShapeLayerLineCap(_ input: String) -> CAShapeLayerLineCap {
+	return CAShapeLayerLineCap(rawValue: input)
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToCAShapeLayerLineJoin(_ input: String) -> CAShapeLayerLineJoin {
+	return CAShapeLayerLineJoin(rawValue: input)
+}
